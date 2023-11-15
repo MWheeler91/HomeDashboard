@@ -1,0 +1,54 @@
+{% extends 'catalog/base.html' %}
+{% load crispy_forms_filters %}
+{% load crispy_forms_tags %}
+{% crispy ItemFilter ItemFilter.helper %}
+{% load humanize %}
+{% block content %}
+
+<div class="container">
+        <div class="row">
+            <div class="col-4 text-center">
+                <h1>New Category</h1>
+                <form class="" method="POST">
+                    {% csrf_token %}
+                    {{ category|crispy }}
+                    <button type='submit' class="btn btn-primary" name=''>Save</button>
+                    <a class="btn btn-danger" href="{% url 'catalog:category_list' %}">Delete</a>
+                </form>
+            </div>
+            <div class="col-4 text-center">
+                <h1>New Condition</h1>
+                <form class="" method="POST">
+                    {% csrf_token %}
+                    {{ condition|crispy }}
+                    <button type='submit' class="btn btn-primary" name=''>Save</button>
+                    <a class="btn btn-danger" href="{% url 'catalog:condition_list' %}">Delete</a>
+                </form>
+            </div>
+            <div class="col-4 text-center">
+                <h1>New Room</h1>
+                <form class="" method="POST">
+                    {% csrf_token %}
+                    {{ room|crispy }}
+                    <button type='submit' class="btn btn-primary" name=''>Save</button>
+                    <a class="btn btn-danger" href="{% url 'catalog:room_list' %}">Delete</a>
+                </form>
+            </div>
+        </div>
+   </div>
+    <hr>
+    <div class="container">
+        <div class="row text-center">
+            <h1>New Item</h1>
+            <form class="" method="POST">
+                {% csrf_token %}
+                {{ item|crispy }}
+                <button type='submit' class="btn btn-primary" name=''>Save</button>
+            </form>
+        </div>
+    </div>
+
+
+
+
+{% endblock %}
