@@ -1,0 +1,17 @@
+{% extends 'catalog/base.html' %}
+{% load crispy_forms_filters %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+    <div class="container text-center">
+           <h1>Edit Object</h1>
+            <form class="" method="POST">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button  class="btn btn-primary mt-4"  type='submit'>
+                    <a href="{% url 'catalog:main'%}"></a>Save
+                </button>
+            </form>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'catalog/base.html' %}
+{% load crispy_forms_filters %}
+{% load crispy_forms_tags %}
+{% crispy ItemFilter ItemFilter.helper %}
+{% load humanize %}
+{% block content %}
+
+    <div class="container">
+       <table class="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Category ID</th>
+                    <th>Category</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+           <tbody>
+                {% for item in object_list %}
+                    <tr>
+                        <th>{{ forloop.counter }}</th>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item }}</td>
+                        <td><a class="btn btn-primary" href="{% url 'catalog:category_edit' pk=item.id %}">Edit</a></td>
+                        <td><a class="btn btn-danger" href="{% url 'catalog:category_delete' pk=item.id %}">Delete</a></td>
+                    </tr>
+                {% endfor %}
+           </tbody>
+        </table>
+    </div>
+
+{% endblock %}

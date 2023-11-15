@@ -1,0 +1,102 @@
+{% extends 'catalog/base.html' %}
+{% load crispy_forms_filters %}
+{% load crispy_forms_tags %}
+{% crispy ItemFilter ItemFilter.helper %}
+{% load humanize %}
+
+
+{% block content %}
+
+        <div class="container text-center">
+            <h1>Filtering</h1>
+            <form method="get">
+                <div class="row">
+                    <div class="col-6">
+                        {{ filter.form.item_name|as_crispy_field }}
+                    </div>
+                    <div class="col-6">
+                        {{ filter.form.item_description|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        {{ filter.form.item_category|as_crispy_field }}
+                    </div>
+                    <div class="col-4">
+                        {{ filter.form.condition|as_crispy_field }}
+                    </div>
+                     <div class="col-4">
+                        {{ filter.form.room|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        {{ filter.form.value_start|as_crispy_field }}
+                    </div>
+                    <div class="col-3">
+                        {{ filter.form.value_end|as_crispy_field }}
+                    </div>
+                    <div class="col-3">
+                        {{ filter.form.start_date|as_crispy_field }}
+                    </div>
+                    <div class="col-3">
+                        {{ filter.form.end_date|as_crispy_field }}
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary m-2">Search</button>
+                <a class="btn btn-secondary" href="{% url 'catalog:main' %}">Reset</a>
+            </form>
+
+        </div>
+        <div class="row text-center px-3">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col"> </th>
+                        <th scope="col">Item ID</th>
+                        <th scope="col">Item Name</th>
+                        <th scope="col">Item Description</th>
+                        <th scope="col">Item Category</th>
+                        <th scope="col">Condition</th>
+                        <th scope="col">Value</th>
+                        <th scope="col">Room</th>
+                        <th scope="col">Date Entered</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in page_obj %}
+                        <th>{{ forloop.counter }}</th>
+                            <td>{{ item.id }}</td>
+                            <td>{{ item.item_name }}</td>
+                            <td>{{ item.item_description|truncatechars:20 }}</td>
+                            <td>{{ item.item_category }}</td>
+                            <td>{{ item.condition }}</td>
+                            <td>${{ item.value|floatformat:2|intcomma }}</td>
+                            <td>{{ item.room }}</td>
+                            <td>{{ item.date_entered }}</td>
+                            <td> <a class="btn btn-primary" href="{% url 'catalog:edit' pk=item.id %}">Edit</a></td>
+                            <td><a class="btn btn-danger" href="{% url 'catalog:delete' pk=item.id %}">Delete</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    <div class="container text-center pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+{% endblock %}
