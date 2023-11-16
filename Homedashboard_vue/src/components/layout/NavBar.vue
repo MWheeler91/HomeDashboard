@@ -1,6 +1,6 @@
 <template>
   <nav class="navbar navbar-expand-xl navbar-dark bg-dark" role="navigation" aria-label="">
-    <div class="container-fluid">
+    <div class="container-fluid ">
 <<<<<<< HEAD
       <router-link to="/">
         <a class="nav-btn" href="#">Home</a>
