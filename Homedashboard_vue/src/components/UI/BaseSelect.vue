@@ -37,7 +37,6 @@ export default {
   methods: {
     setSelectedValue(value) {
       this.selectedOption = value
-      console.log(this.selectedOption)
     }
   }
 }

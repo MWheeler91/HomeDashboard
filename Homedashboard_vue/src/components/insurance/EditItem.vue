@@ -14,12 +14,12 @@
             <div class="col-md-12">
                 <div class="row">
                     <div class="col-md-4">
-                        <base-select v-model="data.item_category" label="Item Category" class="" :options="this.form_options.category"
-                            required />
+                        <base-select v-model="data.item_category" label="Item Category" class=""
+                            :options="this.form_options.category" required />
                     </div>
                     <div class="col-md-4">
-                        <base-select v-model="data.condition" label="Condition" class="" :options="this.form_options.condition"
-                            required />
+                        <base-select v-model="data.condition" label="Condition" class=""
+                            :options="this.form_options.condition" required />
                     </div>
                     <div class="col-md-4">
                         <base-select v-model="data.room" label="Room" class="" :options="this.form_options.room" required />
@@ -114,4 +114,5 @@ input {
     border-style: solid;
     border-width: thin;
     border-color: black;
-}</style>
+}
+</style>

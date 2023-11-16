@@ -7,7 +7,7 @@
             :placeholder="placeholder"
             class="field form-control mb-3"
             :value="modelValue"
-            @change="$emit('update:modelValue', $event.target.value)"/>
+            @input="$emit('update:modelValue', $event.target.value)"/>
 </template>
 
 <script>

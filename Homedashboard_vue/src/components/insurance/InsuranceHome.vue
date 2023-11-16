@@ -1,5 +1,12 @@
 <template>
     <div class="container-fluid">
+
+        <InsuranceFilter :filteredTableData="this.filteredTableData" :tableData="this.tableData"
+            :form_options="this.form_options" @filterChanged="filterTableData" />
+
+
+
+
         <div class="row">
             <div class="col-md-12">
                 <button class="btn btn-primary mt-3 float-end" @click="() => TogglePopup('buttonTrigger')">
@@ -20,7 +27,7 @@
 
 
         <div class="col-md-12">
-            <BaseTable :data="this.data" @delete-item="handleRemoveItem" @update-row="handelUpdateRow" />
+            <BaseTable :data="this.filteredTableData" @delete-item="handleRemoveItem" @update-row="handelUpdateRow" />
         </div>
 
     </div>
@@ -33,12 +40,14 @@ import axios from "axios";
 
 import NewItem from "@/components/insurance/NewItem.vue";
 import EditItem from "@/components/insurance/EditItem.vue";
+import InsuranceFilter from "@/components/insurance/InsuranceFilter.vue";
 
 // may not use these
 import AppCard from "@/components/apps/AppCard.vue";
 import AppCardWrapper from "@/components/apps/AppCardWrapper.vue";
 
 import BaseTable from "@/components/UI/BaseTable.vue";
+
 import Popup from "@/components/UI/Popup.vue";
 
 
@@ -46,6 +55,7 @@ export default {
     name: 'InsuranceHome',
     components: {
         BaseTable,
+        InsuranceFilter,
         Popup,
         NewItem,
         EditItem,
@@ -78,6 +88,20 @@ export default {
                 },
                 tableData: []
             },
+            filteredTableData: {
+                tableHeaders: {
+                    id: "Item ID",
+                    item_name: "Item Name",
+                    item_description: "Item Description",
+                    item_category: "Category",
+                    condition: "Condition",
+                    room: "Room",
+                    value: "Value",
+                    date_entered: "Date Entered",
+                    entered_by: "Entered By"
+                },
+                tableData: []
+            },
             form_options: {
                 category: [],
                 room: [],
@@ -89,7 +113,9 @@ export default {
             updateItemTitle: "Update Item",
 
             // data prop of the item be edited to pass to the EditItem comp
-            editItemData: {}
+            editItemData: {},
+            // data prop for filtering the table
+
         }
     },
     setup() {
@@ -124,6 +150,8 @@ export default {
                     .get('/api/catalog/item-list', this.data.tableData)
                     .then(response => {
                         this.data.tableData = response.data
+                        this.filteredTableData.tableData = response.data
+
                     })
                     .catch(error => {
                         console.log(error)
@@ -140,6 +168,11 @@ export default {
                     console.log(error)
                 })
         },
+        // Filters the data.table data prop and updates the filter tabled prop
+        filterTableData(params) {
+            this.filteredTableData.tableData = this.data.tableData.filter(item =>
+                item[params.filterKey].toLowerCase().includes(params.filterValue.toLowerCase()))
+        },
         // sends delete request to the back end to delete the item from the backend then updates the tableData var
         handleRemoveItem(id) {
             axios
@@ -153,6 +186,7 @@ export default {
             const updatedTableData = this.data.tableData.filter(item => item.id !== id);
 
             this.data.tableData = updatedTableData
+            this.filteredTableData = updatedTableData
         },
         // sets the pop up trigger to true and generates the edit item comp
         handelUpdateRow(row) {
