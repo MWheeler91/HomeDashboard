@@ -1,7 +1,7 @@
 from django.urls import path
 from catalog import views
 
-app_name = "catalog"
+app_name = "catelog"
 
 urlpatterns = [
     path('get-values', views.GetValues.as_view(), name='getvalues'),
