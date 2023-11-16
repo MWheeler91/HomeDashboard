@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import datetime
 from account.models import User
+
 # Create your models here.
 
 
@@ -37,5 +38,3 @@ class Item(models.Model):
 
     def __str__(self):
         return "{} - {}".format(self.id, self.item_name)
-
-
