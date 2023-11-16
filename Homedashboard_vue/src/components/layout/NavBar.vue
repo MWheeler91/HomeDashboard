@@ -1,7 +1,9 @@
 <template>
   <nav class="navbar navbar-expand-xl navbar-dark bg-dark" role="navigation" aria-label="">
     <div class="container-fluid">
-
+      <router-link to="/">
+        <a class="nav-btn" href="#">Home</a>
+      </router-link>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -92,7 +94,14 @@ export default {
   color: rgba(255, 255, 255, .55);
   padding-right: 0.5rem;
   padding-left: 0.5rem;
+  text-decoration: none;
+
 }
+a:hover, a:visited, a:link, a:active{
+  text-decoration: none;
+
+}
+
 </style>
 
 
