@@ -213,9 +213,11 @@ export default {
                     console.log(error)
                 })
             const updatedTableData = this.data.tableData.filter(item => item.id !== id);
-
+            
+            // this.resetFlag += 1
             this.data.tableData = updatedTableData
-            this.filteredTableData = updatedTableData
+            this.filteredTableData.tableData = updatedTableData
+            // this.resetFlag -= 1
         },
         // sets the pop up trigger to true and generates the edit item comp
         handelUpdateRow(row) {
@@ -227,6 +229,7 @@ export default {
             this.resetFlag += 1
             this.filteredTableData.tableData = this.data.tableData
             this.resetFlag -= 1
+
         }
     },
     computed: {

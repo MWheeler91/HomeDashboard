@@ -18,10 +18,13 @@ class Vehicle(models.Model):
     model = models.CharField(max_length=30)
     trim = models.CharField(max_length=30, blank=True, null=True)
     description = models.CharField(max_length=50, blank=True, null=True)
+    vin_number = models.CharField(max_length=17, default="")
     starting_mileage = models.IntegerField()
     date_entered = models.DateField(default=datetime.now)
     entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     is_active = models.BooleanField(default=True)
+
+     
 
     def __str__(self):
         return f"{self.year} {self.make} {self.model}"
@@ -37,6 +40,9 @@ class Maintenance(models.Model):
     next_service_date = models.DateField(blank=True, null=True)
     date_entered = models.DateField(default=datetime.now)
     entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+
+    # part details ( part used / part number )
 
     def __str__(self):
         return f"{self.vehicle} - {self.short_description}"
