@@ -13,9 +13,9 @@ def maintenance_file_upload_path(instance, filename):
 
 
 class Vehicle(models.Model):
+    year = models.IntegerField()
     make = models.CharField(max_length=30)
     model = models.CharField(max_length=30)
-    year = models.IntegerField()
     trim = models.CharField(max_length=30, blank=True, null=True)
     description = models.CharField(max_length=50, blank=True, null=True)
     starting_mileage = models.IntegerField()
@@ -40,11 +40,17 @@ class Maintenance(models.Model):
 
     def __str__(self):
         return f"{self.vehicle} - {self.short_description}"
+    
+    class Meta:
+        verbose_name = "Maintenance"
+        verbose_name_plural = "Maintenance"
 
 
 class MaintenanceFile(models.Model):
     maintenance = models.ForeignKey(Maintenance, on_delete=models.SET_NULL, null=True)
-    files = models.FileField(upload_to=maintenance_file_upload_path, blank=True, null=True)
+    files = models.FileField(
+        upload_to=maintenance_file_upload_path, blank=True, null=True
+    )
 
     def file_name(self):
         return os.path.basename(self.files.name)
@@ -63,6 +69,14 @@ class Accessory(models.Model):
     purchase_date = models.DateField(blank=True, null=True)
     date_entered = models.DateField(default=datetime.now)
     entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    is_active = models.BooleanField(default=True, verbose_name = "Still Own?")
+
+    def __str__(self):
+        return f"{self.vehicle} - {self.short_description}"
+    
+    class Meta:
+        verbose_name = "Accessory"
+        verbose_name_plural = "Accessories"
 
 
 class AccessoriesFile(models.Model):
