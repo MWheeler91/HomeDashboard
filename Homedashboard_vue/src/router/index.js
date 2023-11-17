@@ -7,7 +7,7 @@ import { useUserStore } from '@/store/user'
 
 const index = createRouter({
   scrollBehavior(to, from, savedPosition) {
-    console.log(to, from, savedPosition)
+    // console.log(to, from, savedPosition)
     return { top: 0 }
   },
   history: createWebHistory(),

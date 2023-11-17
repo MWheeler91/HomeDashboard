@@ -1,19 +1,28 @@
 <template>
     <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <InsuranceFilter :filteredTableData="this.filteredTableData" :form_options="this.form_options"
+                    @filterChanged="filterTableData" @resetFilters="resetFilters"/>
 
-        <InsuranceFilter :filteredTableData="this.filteredTableData" :tableData="this.tableData"
-            :form_options="this.form_options" @filterChanged="filterTableData" />
-
-
+            </div>
+        </div>
+        <hr>
 
 
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-12"> 
+                <h4 class="text-center text-white">Total number of lines is {{filteredTableLines}}</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="">
                 <button class="btn btn-primary mt-3 float-end" @click="() => TogglePopup('buttonTrigger')">
                     New Item
                 </button>
-            </div>
         </div>
+        </div>
+
 
 
         <popup v-if="popupTriggers.buttonTrigger">
@@ -27,7 +36,7 @@
 
 
         <div class="col-md-12">
-            <BaseTable :data="this.filteredTableData" @delete-item="handleRemoveItem" @update-row="handelUpdateRow" />
+            <BaseTable :data="this.filteredTableData" @delete-item="handleRemoveItem" @update-row="handelUpdateRow" :key="resetFlag"/>
         </div>
 
     </div>
@@ -107,7 +116,7 @@ export default {
                 room: [],
                 condition: [],
             },
-
+            resetFlag: 0,
             newItemTitle: "New Item",
             editItemTitle: "Edit Item",
             updateItemTitle: "Update Item",
@@ -139,8 +148,6 @@ export default {
     // Calls getData to fill table data var.
     mounted() {
         this.getData()
-
-
     },
     methods: {
         // gets data from the item-list API
@@ -168,10 +175,32 @@ export default {
                     console.log(error)
                 })
         },
-        // Filters the data.table data prop and updates the filter tabled prop
         filterTableData(params) {
-            this.filteredTableData.tableData = this.data.tableData.filter(item =>
-                item[params.filterKey].toLowerCase().includes(params.filterValue.toLowerCase()))
+            // Initialize a copy of the tableData
+            let filteredData = [...this.data.tableData];
+
+            // Iterate over each key in the params object
+            for (const filterKey in params) {
+                if (Object.hasOwnProperty.call(params, filterKey)) {
+                    const filterValue = params[filterKey].toString().toLowerCase();
+
+                    // Apply the filter for the current key
+                    filteredData = filteredData.filter(item => {
+                        const itemValue = item[filterKey];
+
+                        // Check if the item value is a number
+                        if (typeof itemValue === 'number') {
+                            // Convert the number to a string for comparison
+                            return itemValue.toString().toLowerCase().includes(filterValue);
+                        } else {
+                            // Convert the item value to lowercase and check for inclusion
+                            return itemValue.toString().toLowerCase().includes(filterValue);
+                        }
+                    });
+                }
+            }
+            // Update the filteredTableData with the final result
+            this.filteredTableData.tableData = filteredData;
         },
         // sends delete request to the back end to delete the item from the backend then updates the tableData var
         handleRemoveItem(id) {
@@ -193,8 +222,23 @@ export default {
             this.popupTriggers.editTrigger = true
             this.editItemData = row
         },
+        resetFilters(){
+            // this.getData()
+            this.resetFlag += 1
+            this.filteredTableData.tableData = this.data.tableData
+            this.resetFlag -= 1
+        }
+    },
+    computed: {
+        filteredTableLines() {
+            return this.filteredTableData.tableData.length;
+        },
+        TableLines() {
+            return this.filteredTableData.tableData.length;
+        },
 
     }
+
 }
 </script>
 

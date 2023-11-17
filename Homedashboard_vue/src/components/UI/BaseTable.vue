@@ -17,7 +17,7 @@
                         <span v-else>{{ value }}</span>
                     </td>
                     <td>
-                        <a class="btn btn-primary" @click="updateRow(row)">Edit</a>
+                        <a class="btn btn-primary mx-2" @click="updateRow(row)">Edit</a>
                         <a class="btn btn-danger" @click="removeItemById(row.id)">Delete</a>
                     </td>
                 </tr>

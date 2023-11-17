@@ -49,4 +49,7 @@ body {
   height: 50px;
   color: white;
 }
+.verticalBtn{
+  vertical-align: middle
+}
 </style>
