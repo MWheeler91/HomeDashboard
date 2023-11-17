@@ -6,10 +6,8 @@ from .serializers import *
 from django.http import Http404
 
 
-
-
-
 # Create your views here.
+
 
 class GetValues(APIView):
     def get(self, request):
@@ -18,7 +16,7 @@ class GetValues(APIView):
         category = Category.objects.all()
 
         room_serializer = RoomSerializer(rooms, many=True)
-        condition_serializer = ConditionSerializer(condition, many=True )
+        condition_serializer = ConditionSerializer(condition, many=True)
         category_serializer = CategorySerializer(category, many=True)
 
         room_list = [item["room"] for item in room_serializer.data]
@@ -26,24 +24,26 @@ class GetValues(APIView):
         category_list = [item["item_category"] for item in category_serializer.data]
 
         data = {
-            "room": room_list,  
+            "room": room_list,
             "condition": condition_list,
-            "category": category_list
+            "category": category_list,
         }
 
         return Response(data)
-    
+
 
 class NewItem(APIView):
     def post(self, request):
         print(request.data)
-        room_id = Room.objects.get(room=request.data['room'])
-        item_category_id = Category.objects.get(item_category=request.data['item_category'])
-        condition_id = Condition.objects.get(condition=request.data['condition'])
+        room_id = Room.objects.get(room=request.data["room"])
+        item_category_id = Category.objects.get(
+            item_category=request.data["item_category"]
+        )
+        condition_id = Condition.objects.get(condition=request.data["condition"])
 
-        request.data['room'] = room_id.id
-        request.data['item_category'] = item_category_id.id
-        request.data['condition'] = condition_id.id
+        request.data["room"] = room_id.id
+        request.data["item_category"] = item_category_id.id
+        request.data["condition"] = condition_id.id
 
         serializer = NewItemSerializer(data=request.data)
 
@@ -57,7 +57,6 @@ class NewItem(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class DeleteItem(APIView):
     def delete(self, request, id):
         print(request.data)
@@ -66,34 +65,46 @@ class DeleteItem(APIView):
             # Get the item by ID
             item = Item.objects.get(pk=id)
         except Item.DoesNotExist:
-            return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND
+            )
 
         # Delete the item
         item.delete()
 
-        return Response({"message": "Item deleted successfully"}, status=status.HTTP_200_OK)
+        return Response(
+            {"message": "Item deleted successfully"}, status=status.HTTP_200_OK
+        )
+
 
 class UpdateItem(APIView):
     def put(self, request, id):
         print(request.data)
 
         try:
-            room_id = Room.objects.get(room=request.data['room'])
-            item_category_id = Category.objects.get(item_category=request.data['item_category'])
-            condition_id = Condition.objects.get(condition=request.data['condition'])
+            room_id = Room.objects.get(room=request.data["room"])
+            item_category_id = Category.objects.get(
+                item_category=request.data["item_category"]
+            )
+            condition_id = Condition.objects.get(condition=request.data["condition"])
 
-            item = Item.objects.get(id=request.data['id'])
-            item.item_name = request.data['item_name']
-            item.item_description = request.data['item_description']
+            item = Item.objects.get(id=request.data["id"])
+            item.item_name = request.data["item_name"]
+            item.item_description = request.data["item_description"]
             item.item_category = item_category_id
             item.condition = condition_id
             item.room = room_id
-            item.value = request.data['value']
+            item.value = request.data["value"]
             item.save()
-            return Response({"message": "Item updated successfully"}, status=status.HTTP_200_OK)
+            return Response(
+                {"message": "Item updated successfully"}, status=status.HTTP_200_OK
+            )
 
         except Item.DoesNotExist:
-                return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND) 
+            return Response(
+                {"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
 
 class GetAllItems(APIView):
     def get(self, request):
