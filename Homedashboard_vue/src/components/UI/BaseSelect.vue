@@ -1,8 +1,8 @@
 <template>
   <label class="form-label">{{ label }}</label>
-  <select v-bind="$attrs" class="field form-control" :value="this.selectedOption"
+  <select v-bind="$attrs" class="field form-control mb-3" :value="this.selectedOption"
     @change="setSelectedValue($event.target.value), $emit('update:modelValue', $event.target.value)">
-    <option value="Choose"></option>
+    <option value=" "></option>
     <option v-for="option in options" :value="option" :key="option" selected="">
       {{ option }}
     </option>
