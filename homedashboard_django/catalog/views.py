@@ -94,6 +94,8 @@ class UpdateItem(APIView):
             item.item_category = item_category_id
             item.condition = condition_id
             item.room = room_id
+            item.serial_number = request.data['serial_number']
+            item.model_number = request.data['model_number']
             item.value = request.data["value"]
             item.save()
             return Response(
