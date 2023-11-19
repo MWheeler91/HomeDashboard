@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-md-12">
                 <InsuranceFilter :filteredTableData="this.filteredTableData" :form_options="this.form_options"
-                    @filterChanged="filterTableData" @resetFilters="resetFilters"/>
+                    @filterChanged="filterTableData" @resetFilters="resetFilters" />
 
             </div>
         </div>
@@ -11,8 +11,8 @@
 
 
         <div class="row">
-            <div class="col-md-12"> 
-                <h4 class="text-center text-white">Total number of lines is {{filteredTableLines}}</h4>
+            <div class="col-md-12">
+                <h4 class="text-center text-white">Total number of lines is {{ filteredTableLines }}</h4>
             </div>
         </div>
         <div class="row">
@@ -20,7 +20,7 @@
                 <button class="btn btn-primary mt-3 float-end" @click="() => TogglePopup('buttonTrigger')">
                     New Item
                 </button>
-        </div>
+            </div>
         </div>
 
 
@@ -36,7 +36,8 @@
 
 
         <div class="col-md-12">
-            <BaseTable :data="this.filteredTableData" @delete-item="handleRemoveItem" @update-row="handelUpdateRow" :key="resetFlag"/>
+            <BaseTable :data="this.filteredTableData" @delete-item="handleRemoveItem" @update-row="handelUpdateRow"
+                :key="resetFlag" />
         </div>
 
     </div>
@@ -75,13 +76,6 @@ export default {
     },
     data() {
         return {
-            // default values for "new item button".  This is not being used now.
-            empty: {
-                id: 999,
-                app_name: 'Create New',
-                web_address: 'nah',
-                icon: './src/assets/plus.png'
-            },
             // Data for the table
             data: {
                 tableHeaders: {
@@ -92,6 +86,8 @@ export default {
                     condition: "Condition",
                     room: "Room",
                     value: "Value",
+                    serial_number: "Serial Number",
+                    model_number: "Model Number",
                     date_entered: "Date Entered",
                     entered_by: "Entered By"
                 },
@@ -106,6 +102,8 @@ export default {
                     condition: "Condition",
                     room: "Room",
                     value: "Value",
+                    serial_number: "Serial Number",
+                    model_number: "Model Number",
                     date_entered: "Date Entered",
                     entered_by: "Entered By"
                 },
@@ -158,7 +156,7 @@ export default {
                     .then(response => {
                         this.data.tableData = response.data
                         this.filteredTableData.tableData = response.data
-
+                        console.log(response.data)
                     })
                     .catch(error => {
                         console.log(error)
@@ -213,7 +211,7 @@ export default {
                     console.log(error)
                 })
             const updatedTableData = this.data.tableData.filter(item => item.id !== id);
-            
+
             // this.resetFlag += 1
             this.data.tableData = updatedTableData
             this.filteredTableData.tableData = updatedTableData
@@ -224,7 +222,7 @@ export default {
             this.popupTriggers.editTrigger = true
             this.editItemData = row
         },
-        resetFilters(){
+        resetFilters() {
             // this.getData()
             this.resetFlag += 1
             this.filteredTableData.tableData = this.data.tableData

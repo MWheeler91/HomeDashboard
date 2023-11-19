@@ -7,26 +7,36 @@ from .models import *
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['item_category']
+        fields = ["item_category"]
 
 
 class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
-        fields = ['room']
+        fields = ["room"]
 
 
 class ConditionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Condition
-        fields = ['condition']
-
+        fields = ["condition"]
 
 
 class NewItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
-        fields = ['item_name', 'item_description', 'item_category','condition', 'room','value','entered_by' ]
+        fields = [
+            "item_name",
+            "item_description",
+            "item_category",
+            "condition",
+            "room",
+            "value",
+            "serial_number",
+            "model_number",
+            "entered_by",
+        ]
+
 
 class GetAllItemSerializer(serializers.ModelSerializer):
     item_category = serializers.StringRelatedField()
@@ -36,8 +46,19 @@ class GetAllItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ['id', 'item_name', 'item_description', 'item_category','condition', 'room','value','date_entered','entered_by' ]
-        
+        fields = [
+            "id",
+            "item_name",
+            "item_description",
+            "item_category",
+            "condition",
+            "room",
+            "value",
+            "serial_number",
+            "model_number",
+            "date_entered",
+            "entered_by",
+        ]
 
     def get_entered_by(self, obj):
         # Customize how you want to represent the 'entered_by' field

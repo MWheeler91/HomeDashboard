@@ -11,6 +11,21 @@
             <div class="col-md-12">
                 <base-input v-model="data.value" label="Value" type="number" class="" required />
             </div>
+
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-6">
+                        <base-input v-model="data.model_number" label="Model Number" type="text" class=""  />
+
+                    </div>
+                    <div class="col-md-6">
+                        <base-input v-model="data.serial_number" label="Serial Number" type="text" class=""  />
+                    </div>
+                </div>
+            </div>
+
+
+
             <div class="col-md-12">
                 <div class="row">
                     <div class="col-md-4">
@@ -84,7 +99,10 @@ export default {
             formData.append('condition', this.data.condition)
             formData.append('value', this.data.value)
             formData.append('room', this.data.room)
+            formData.append('model_number', this.data.model_number)
+            formData.append('serial_number', this.data.serial_number)
             formData.append('person_id', this.userStore.user.id)
+
 
             console.log(formData)
             axios

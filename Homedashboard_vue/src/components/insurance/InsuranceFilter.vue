@@ -3,42 +3,57 @@
         <div class="row  text-white text-center pt-4 align-items-center">
             <div class="col-md-1">
                 <BaseFilterInput v-model="data.id" @filterChanged="updateFilter" :label="filteredTableData.tableHeaders.id"
-                    :theKey="this.keyValues.id"   :key="resetFlag"/>
+                    :theKey="this.keyValues.id" :key="resetFlag" />
             </div>
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <BaseFilterInput v-model="data.item_name" @filterChanged="updateFilter"
-                    :label="filteredTableData.tableHeaders.item_name" :theKey="this.keyValues.item_name" :key="resetFlag"/>
+                    :label="filteredTableData.tableHeaders.item_name" :theKey="this.keyValues.item_name" :key="resetFlag" />
             </div>
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <BaseFilterInput v-model="data.item_description" @filterChanged="updateFilter"
-                    :label="filteredTableData.tableHeaders.item_description" :theKey="this.keyValues.item_description" :key="resetFlag"/>
+                    :label="filteredTableData.tableHeaders.item_description" :theKey="this.keyValues.item_description"
+                    :key="resetFlag" />
             </div>
             <div class="col-md-1">
                 <BaseFilterInput v-model="data.item_category" @filterChanged="updateFilter"
                     :label="filteredTableData.tableHeaders.item_category" mode="select"
-                    :options="this.form_options.category" :theKey="this.keyValues.item_category" :key="resetFlag"/>
+                    :options="this.form_options.category" :theKey="this.keyValues.item_category" :key="resetFlag" />
             </div>
             <div class="col-md-1">
                 <BaseFilterInput v-model="data.condition" @filterChanged="updateFilter"
                     :label="filteredTableData.tableHeaders.condition" mode="select" :options="this.form_options.condition"
-                    :theKey="this.keyValues.condition" :key="resetFlag"/>
+                    :theKey="this.keyValues.condition" :key="resetFlag" />
             </div>
             <div class="col-md-1">
                 <BaseFilterInput v-model="data.room" @filterChanged="updateFilter"
                     :label="filteredTableData.tableHeaders.room" mode="select" :options="this.form_options.room"
-                    :theKey="this.keyValues.room" :key="resetFlag"/>
+                    :theKey="this.keyValues.room" :key="resetFlag" />
             </div>
             <div class="col-md-1">
                 <BaseFilterInput v-model="data.value" @filterChanged="updateFilter"
-                    :label="filteredTableData.tableHeaders.value" :theKey="keyValues.value" :key="resetFlag"/>
+                    :label="filteredTableData.tableHeaders.value" :theKey="keyValues.value" :key="resetFlag" />
+            </div>
+
+            <div class="col-md-1">
+                <BaseFilterInput v-model="data.serial_number" @filterChanged="updateFilter"
+                    :label="filteredTableData.tableHeaders.serial_number" :theKey="keyValues.serial_number"
+                    :key="resetFlag" />
+            </div>
+            <div class="col-md-1">
+                <BaseFilterInput v-model="data.model_number" @filterChanged="updateFilter"
+                    :label="filteredTableData.tableHeaders.model_number" :theKey="keyValues.model_number"
+                    :key="resetFlag" />
+            </div>
+
+            <div class="col-md-1">
+                <BaseFilterInput v-model="data.entered_by" @filterChanged="updateFilter"
+                    :label="filteredTableData.tableHeaders.date_entered" :theKey="this.keyValues.date_entered"
+                    :key="resetFlag" />
             </div>
             <div class="col-md-1">
                 <BaseFilterInput v-model="data.entered_by" @filterChanged="updateFilter"
-                    :label="filteredTableData.tableHeaders.date_entered" :theKey="this.keyValues.date_entered" :key="resetFlag"/>
-            </div>
-            <div class="col-md-1">
-                <BaseFilterInput v-model="data.entered_by" @filterChanged="updateFilter"
-                    :label="filteredTableData.tableHeaders.entered_by" :theKey="this.keyValues.entered_by" :key="resetFlag"/>
+                    :label="filteredTableData.tableHeaders.entered_by" :theKey="this.keyValues.entered_by"
+                    :key="resetFlag" />
             </div>
             <div class="col-md-1">
                 <a class="btn btn-secondary align-center" @click="resetTable()">Clear Filters</a>
@@ -70,6 +85,8 @@ export default {
                 condition: '',
                 room: '',
                 value: '',
+                serial_number: "",
+                model_number: "",
                 date_entered: '',
                 entered_by: ''
             },
@@ -81,6 +98,8 @@ export default {
                 condition: "condition",
                 room: "room",
                 value: "value",
+                serial_number: "serial_number",
+                model_number: "model_number",
                 date_entered: "date_entered",
                 entered_by: "entered_by"
             },
@@ -92,6 +111,8 @@ export default {
                 condition: '',
                 room: '',
                 value: '',
+                serial_number: "",
+                model_number: "",
                 date_entered: '',
                 entered_by: ''
             },

@@ -1,7 +1,9 @@
 import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'homedashboard_django.settings')
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "homedashboard_django.settings")
 
 import django
+
 django.setup()
 
 
@@ -12,7 +14,7 @@ from account.models import User
 
 from PIL import Image
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'homedashboard_django.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "homedashboard_django.settings")
 
 
 # fake pop script
@@ -31,11 +33,10 @@ def FakeItem():
     allconditions = list(Condition.objects.all())
     allpeople = list(User.objects.all())
 
-    rand_item_category=random.randrange(len(allcatagories)),
-    rand_condition=random.randrange(len(allconditions)),
-    rand_room=random.randrange(len(allrooms)),
-    rand_entered_by=random.randrange(len(allpeople))
-    print(rand_item_category)
+    rand_item_category = (random.randrange(len(allcatagories)),)
+    rand_condition = (random.randrange(len(allconditions)),)
+    rand_room = (random.randrange(len(allrooms)),)
+    rand_entered_by = random.randrange(len(allpeople))
 
     item = Item.objects.get_or_create(
         item_name=fakegen.company(),
@@ -43,8 +44,10 @@ def FakeItem():
         item_category=allcatagories[rand_item_category[0]],
         condition=allconditions[rand_condition[0]],
         room=allrooms[rand_room[0]],
-        value=random.randint(1,10000),
-        entered_by=allpeople[0]
+        value=random.randint(1, 10000),
+        model_number=fakegen.ssn(),
+        serial_number=fakegen.ssn(),
+        entered_by=allpeople[rand_entered_by],
     )
 
 
@@ -53,6 +56,5 @@ def populate_data(n=300):
         FakeItem()
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
