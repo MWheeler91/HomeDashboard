@@ -157,12 +157,11 @@ PASSWORD_HASHERS = [
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'America/Regina'
-
 USE_I18N = True
-
 USE_TZ = True
+TIME_ZONE = 'US/Central'
+
+
 
 
 # Static files (CSS, JavaScript, Images)
@@ -194,5 +193,6 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSIONS_CLASSES': (
         'rest_framework.permissions.IsAuthenticated'
-    )
+    ),
+    'DATETIME_FORMAT': "%Y-%m-%d %H:%M"
 }
