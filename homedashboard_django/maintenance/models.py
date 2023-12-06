@@ -20,9 +20,12 @@ class Vehicle(models.Model):
     description = models.CharField(max_length=50, blank=True, null=True)
     vin_number = models.CharField(max_length=17, default="")
     starting_mileage = models.IntegerField()
+    is_active = models.BooleanField(default=True)    
+    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='vehicles')
     date_entered = models.DateField(default=datetime.now)
-    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    is_active = models.BooleanField(default=True)
+    last_updated_date = models.DateField(auto_now=True, blank=True, null=True)
+    last_updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
+    last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
      
 
@@ -38,8 +41,11 @@ class Maintenance(models.Model):
     cost = models.DecimalField(max_digits=100, decimal_places=2)
     date_performed = models.DateField(default=datetime.now)
     next_service_date = models.DateField(blank=True, null=True)
+    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='maintence')
     date_entered = models.DateField(default=datetime.now)
-    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    last_updated_date = models.DateField(auto_now=True, blank=True, null=True)
+    last_updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
+    last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_query_name='maintenance_updated')
 
 
     # part details ( part used / part number )
@@ -54,6 +60,10 @@ class Maintenance(models.Model):
 
 class MaintenanceFile(models.Model):
     maintenance = models.ForeignKey(Maintenance, on_delete=models.SET_NULL, null=True)
+    date_entered = models.DateField(default=datetime.now)
+    updated_date = models.DateField(auto_now=True, blank=True, null=True)
+    updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
+    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     files = models.FileField(
         upload_to=maintenance_file_upload_path, blank=True, null=True
     )
@@ -73,9 +83,12 @@ class Accessory(models.Model):
     purchased_from = models.CharField(max_length=50, blank=True, null=True)
     install_date = models.DateField(blank=True, null=True)
     purchase_date = models.DateField(blank=True, null=True)
-    date_entered = models.DateField(default=datetime.now)
-    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     is_active = models.BooleanField(default=True, verbose_name = "Still Own?")
+    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='accessories')
+    date_entered = models.DateField(default=datetime.now)
+    last_updated_date = models.DateField(auto_now=True, blank=True, null=True)
+    last_updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
+    last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return f"{self.vehicle} - {self.short_description}"
@@ -88,8 +101,11 @@ class Accessory(models.Model):
 class AccessoriesFile(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
     accessory = models.ForeignKey(Accessory, on_delete=models.SET_NULL, null=True)
-
     files = models.FileField(upload_to="uploads/accessories/", blank=True, null=True)
+    date_entered = models.DateField(default=datetime.now)
+    updated_date = models.DateField(auto_now=True, blank=True, null=True)
+    updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
+    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     def file_name(self):
         return os.path.basename(self.files.name)

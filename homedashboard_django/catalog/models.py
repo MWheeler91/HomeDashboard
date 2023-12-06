@@ -32,10 +32,15 @@ class Item(models.Model):
     condition = models.ForeignKey(Condition, on_delete=models.SET_NULL, blank=True, null=True)
     room = models.ForeignKey(Room, on_delete=models.SET_NULL, blank=True, null=True)
     value = models.DecimalField(max_digits=100, decimal_places=2, blank=True, null=True)
+    purchase_date = models.DateField(blank=True, null=True)
     serial_number = models.CharField(max_length=50, blank=True, null=True)
     model_number = models.CharField(max_length=50, blank=True, null=True)
+    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='items')
     date_entered = models.DateField(default=datetime.now)
-    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    last_updated_date = models.DateField(auto_now=True, blank=True, null=True)
+    last_updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
+    last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
     
 
     def __str__(self):
