@@ -32,6 +32,8 @@ export default {
         padding: 32px;
         border-radius: 15px;
         border: solid 2px;
+        height: auto;
+        width: 500px;
     }
 
 }

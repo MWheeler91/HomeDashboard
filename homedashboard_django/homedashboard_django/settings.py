@@ -115,7 +115,7 @@ WSGI_APPLICATION = 'homedashboard_django.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME'),
+        'NAME': env('DB_NAME_TEST'),
         'USER': env('DB_USER'),
         'PASSWORD': env('DB_PASSWORD'),
         'HOST': env('DB_HOST'),
