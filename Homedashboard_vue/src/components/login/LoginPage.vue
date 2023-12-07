@@ -22,6 +22,7 @@
                 Submit
             </button>
             <button class="popup-close btn btn-danger mt-3" @click.prevent="togglePopup(); resetData()">
+                <!-- <button class="popup-close btn btn-danger mt-3" @click.prevent="resetData()"> -->
                 Close
             </button>
 
@@ -65,32 +66,42 @@ export default {
             if (this.data.password === '') {
                 this.errors.push('Your password is missing')
             }
+
+
             if (this.errors.length === 0) {
                 await axios
                     .post('/api/account/login/', this.data)
                     .then(response => {
                         this.userStore.setToken(response.data)
-
                         axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.access;
                     })
                     .catch(error => {
-                        console.log('error', error)
+                        if (error == "AxiosError: Network Error") {
+                            this.errors.push("Network Error:  Unable to connect to server!  Please try again later.")
+                        } else {
+                            this.errors.push('Authentication Error: The email or password is incorrect or the user is not activated!')
+                        }
+                    })
+                if (this.errors.length === 0) {
+                    await axios
+                        .get('/api/account/me/')
+                        .then(response => {
+                            this.userStore.setUserInfo(response.data)
+                        })
+                        .catch(error => {
+                            if (error == "AxiosError: Network Error") {
+                                this.errors.push("Network Error:  Unable to connect to server!  Please try again later.")
+                            } else {
+                                this.errors.push('Authentication Error: The email or password is incorrect or the user is not activated!')
+                            }
+                        })
+                }
+                if (this.errors.length === 0) {
+                    this.$emit('togglePopup')
+                    this.reloadPage()
+                }
 
-                        this.errors.push('The email or password is incorrect! Or the user is not activated!')
-                    })
             }
-            if (this.errors.length === 0) {
-                await axios
-                    .get('/api/account/me/')
-                    .then(response => {
-                        this.userStore.setUserInfo(response.data)
-
-                    })
-                    .catch(error => {
-                        console.log('error', error)
-                    })
-            }
-            this.reloadPage()
         },
         resetData() {
             this.data = {
