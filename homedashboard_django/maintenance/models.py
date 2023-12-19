@@ -19,6 +19,7 @@ class Vehicle(models.Model):
     trim = models.CharField(max_length=30, blank=True, null=True)
     description = models.CharField(max_length=50, blank=True, null=True)
     vin_number = models.CharField(max_length=17, default="")
+    license_plate_number = models.CharField(max_length=10, blank=True, null=True)
     starting_mileage = models.IntegerField()
     is_active = models.BooleanField(default=True)    
     entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='vehicles')
@@ -27,7 +28,6 @@ class Vehicle(models.Model):
     last_updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
     last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
-     
 
     def __str__(self):
         return f"{self.year} {self.make} {self.model}"
@@ -46,7 +46,7 @@ class Maintenance(models.Model):
     last_updated_date = models.DateField(auto_now=True, blank=True, null=True)
     last_updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
     last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_query_name='maintenance_updated')
-
+    
 
     # part details ( part used / part number )
 
@@ -112,3 +112,21 @@ class AccessoriesFile(models.Model):
 
     def __str__(self):
         return os.path.basename(self.files.name)
+    
+
+class VehicleRegistration(models.Model):
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
+    registration_expiration_date = models.DateField(blank=True, null=True)
+    date_paid = models.DateField(blank=True, null=True)
+    active_year = models.BooleanField()
+    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='registration')
+    date_entered = models.DateField(default=datetime.now)
+    last_updated_date = models.DateField(auto_now=True, blank=True, null=True)
+    last_updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
+    last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_query_name='registration_updated')
+
+    def __str__(self):
+        return os.path.basename(f"{self.registration_expiration_date.year - 1} - {self.vehicle}")   
+
+
+
