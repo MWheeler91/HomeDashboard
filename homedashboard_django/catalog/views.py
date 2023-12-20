@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-
+from django.db.models import Prefetch
 from .serializers import *
 from django.http import Http404
 import time
@@ -12,8 +12,6 @@ import time
 
 class GetValues(APIView):
     def get(self, request):
-        start_time = time.time()
-
         rooms = Room.objects.all()
         condition = Condition.objects.all()
         category = Category.objects.all()
@@ -31,7 +29,6 @@ class GetValues(APIView):
             "condition": condition_list,
             "category": category_list,
         }
-        print("--- %s seconds ---" % (time.time() - start_time))
 
         return Response(data)
 
@@ -114,7 +111,14 @@ class UpdateItem(APIView):
 
 class GetAllItems(APIView):
     def get(self, request):
-        items = Item.objects.all()
+        # To reduce the number of database queries to get the string values this will call the setup_eager_loading function
+        # in the serializer to pre petch all the related names.
+        # https://docs.djangoproject.com/en/5.0/ref/models/querysets/#prefetch-related
+        items = GetAllItemSerializer.setup_eager_loading(Item.objects.all().prefetch_related(
+            Prefetch('item_category', queryset=Category.objects.all()),
+            Prefetch('condition', queryset=Condition.objects.all()),
+            Prefetch('room', queryset=Room.objects.all()),
+            Prefetch('entered_by', queryset=User.objects.all()),
+            ))
         serializer = GetAllItemSerializer(items, many=True)
         return Response(serializer.data)
-1

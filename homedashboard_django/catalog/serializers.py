@@ -42,7 +42,7 @@ class GetAllItemSerializer(serializers.ModelSerializer):
     item_category = serializers.StringRelatedField()
     condition = serializers.StringRelatedField()
     room = serializers.StringRelatedField()
-    entered_by = serializers.SerializerMethodField()  # Custom method for entered_by
+    entered_by = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
@@ -61,5 +61,11 @@ class GetAllItemSerializer(serializers.ModelSerializer):
         ]
 
     def get_entered_by(self, obj):
-        # Customize how you want to represent the 'entered_by' field
         return obj.entered_by.first_name
+
+    # Optimization the string related fields by prefetching the data.
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        queryset = queryset.select_related('item_category', 'condition', 'room', 'entered_by')
+        print(queryset)
+        return queryset
