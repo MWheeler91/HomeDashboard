@@ -17,6 +17,9 @@
         </div>
         <div class="row">
             <div class="">
+                <vue-awesome-paginate :total-items="filteredTableLines" :items-per-page="itemsPerPage"
+                    :max-pages-shown="maxPagesShown" v-model="currentPage" />
+
                 <button class="btn btn-primary mt-3 float-end" @click="() => TogglePopup('buttonTrigger')">
                     New Item
                 </button>
@@ -35,16 +38,14 @@
         </popup>
 
 
-        <div class="example-one">
-            <vue-awesome-paginate :total-items="filteredTableLines" :items-per-page="itemsPerPage"
-                :max-pages-shown="maxPagesShown" v-model="currentPage" />
+        <!-- <vue-awesome-paginate :total-items="filteredTableLines" :items-per-page="itemsPerPage"
+            :max-pages-shown="maxPagesShown" v-model="currentPage" /> -->
 
-            <div class="col-md-12">
-                <BaseTable :data="paginatedTableData" @delete-item="handleRemoveItem" @update-row="handelUpdateRow"
-                    :key="resetFlag" />
-            </div>
-
+        <div class="col-md-12">
+            <BaseTable :data="paginatedTableData" @delete-item="handleRemoveItem" @update-row="handelUpdateRow"
+                :key="resetFlag" />
         </div>
+
 
 
         <!-- <div class="col-md-12">
@@ -120,22 +121,6 @@ export default {
                 },
                 tableData: []
             },
-            paginatedTableData: {
-                tableHeaders: {
-                    id: "Item ID",
-                    item_name: "Item Name",
-                    item_description: "Item Description",
-                    item_category: "Category",
-                    condition: "Condition",
-                    room: "Room",
-                    value: "Value",
-                    serial_number: "Serial Number",
-                    model_number: "Model Number",
-                    date_entered: "Date Entered",
-                    entered_by: "Entered By"
-                },
-                tableData: []
-            },
             form_options: {
                 category: [],
                 room: [],
@@ -184,7 +169,6 @@ export default {
         // gets data from the item-list API
         async getData() {
             if (this.userStore.user.isAuthenticated) {
-                
                 axios
                     .get('/api/catalog/item-list', this.data.tableData)
                     .then(response => {
@@ -220,7 +204,6 @@ export default {
                     // Apply the filter for the current key
                     filteredData = filteredData.filter(item => {
                         const itemValue = item[filterKey];
-
                         // Check if the item value is a number
                         if (typeof itemValue === 'number') {
                             // Convert the number to a string for comparison
@@ -278,13 +261,28 @@ export default {
             return this.filteredTableData.tableData.length;
         },
         paginatedTableData() {
+            let paginatedTableData =  {
+                tableHeaders: {
+                    id: "Item ID",
+                    item_name: "Item Name",
+                    item_description: "Item Description",
+                    item_category: "Category",
+                    condition: "Condition",
+                    room: "Room",
+                    value: "Value",
+                    serial_number: "Serial Number",
+                    model_number: "Model Number",
+                    date_entered: "Date Entered",
+                    entered_by: "Entered By"
+                },
+                tableData: []
+            }
             const start = (this.currentPage - 1) * this.itemsPerPage;
             const end = start + this.itemsPerPage;
-            this.paginatedTableData.tableData = this.filteredTableData.tableData.slice(start, end);
-            return this.paginatedTableData
+            paginatedTableData.tableData = this.filteredTableData.tableData.slice(start, end);
+            return paginatedTableData
         },
     }
-
 }
 </script>
 
@@ -292,37 +290,4 @@ export default {
 table {
     color: white;
 }
-
-/* .example-one .pagination-container {
-    column-gap: 10px;
-}
-
-.example-one .paginate-buttons {
-    height: 40px;
-    width: 40px;
-    border-radius: 20px;
-    cursor: pointer;
-    background-color: rgb(242, 242, 242);
-    border: 1px solid rgb(217, 217, 217);
-    color: black;
-}
-
-.example-one .paginate-buttons:hover {
-    background-color: #d8d8d8;
-}
-
-.example-one .active-page {
-    background-color: #3498db;
-    border: 1px solid #3498db;
-    color: white;
-}
-
-.example-one .active-page:hover {
-    background-color: #2988c8;
-}
-
-.example-one .back-button:active,
-.example-one .next-button:active {
-    background-color: #c4c4c4;
-} */
 </style>
