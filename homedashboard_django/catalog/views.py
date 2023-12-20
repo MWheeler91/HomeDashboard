@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from .serializers import *
 from django.http import Http404
+import time
 
 
 # Create your views here.
@@ -11,6 +12,8 @@ from django.http import Http404
 
 class GetValues(APIView):
     def get(self, request):
+        start_time = time.time()
+
         rooms = Room.objects.all()
         condition = Condition.objects.all()
         category = Category.objects.all()
@@ -28,6 +31,7 @@ class GetValues(APIView):
             "condition": condition_list,
             "category": category_list,
         }
+        print("--- %s seconds ---" % (time.time() - start_time))
 
         return Response(data)
 
@@ -113,3 +117,4 @@ class GetAllItems(APIView):
         items = Item.objects.all()
         serializer = GetAllItemSerializer(items, many=True)
         return Response(serializer.data)
+1

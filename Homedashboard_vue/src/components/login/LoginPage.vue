@@ -37,9 +37,11 @@ import BaseInput from "@/components/UI/BaseInput.vue";
 import axios from "axios";
 import { useUserStore } from '@/store/user'
 
+
 export default {
     setup() {
         const userStore = useUserStore()
+
         return {
             userStore
         }
@@ -111,7 +113,7 @@ export default {
         },
         reloadPage() {
             window.location.reload();
-        }
+        },
     }
 }
 </script>

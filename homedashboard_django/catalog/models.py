@@ -41,7 +41,8 @@ class Item(models.Model):
     last_updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
     last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
-    
+    class Meta:
+        ordering = ['id']
 
     def __str__(self):
         return "{} - {}".format(self.id, self.item_name)

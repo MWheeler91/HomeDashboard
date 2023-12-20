@@ -35,10 +35,22 @@
         </popup>
 
 
-        <div class="col-md-12">
+        <div class="example-one">
+            <vue-awesome-paginate :total-items="filteredTableLines" :items-per-page="itemsPerPage"
+                :max-pages-shown="maxPagesShown" v-model="currentPage" />
+
+            <div class="col-md-12">
+                <BaseTable :data="paginatedTableData" @delete-item="handleRemoveItem" @update-row="handelUpdateRow"
+                    :key="resetFlag" />
+            </div>
+
+        </div>
+
+
+        <!-- <div class="col-md-12">
             <BaseTable :data="this.filteredTableData" @delete-item="handleRemoveItem" @update-row="handelUpdateRow"
                 :key="resetFlag" />
-        </div>
+        </div> -->
 
     </div>
 </template>
@@ -57,7 +69,6 @@ import AppCard from "@/components/apps/AppCard.vue";
 import AppCardWrapper from "@/components/apps/AppCardWrapper.vue";
 
 import BaseTable from "@/components/UI/BaseTable.vue";
-
 import Popup from "@/components/UI/Popup.vue";
 
 
@@ -109,6 +120,22 @@ export default {
                 },
                 tableData: []
             },
+            paginatedTableData: {
+                tableHeaders: {
+                    id: "Item ID",
+                    item_name: "Item Name",
+                    item_description: "Item Description",
+                    item_category: "Category",
+                    condition: "Condition",
+                    room: "Room",
+                    value: "Value",
+                    serial_number: "Serial Number",
+                    model_number: "Model Number",
+                    date_entered: "Date Entered",
+                    entered_by: "Entered By"
+                },
+                tableData: []
+            },
             form_options: {
                 category: [],
                 room: [],
@@ -118,6 +145,12 @@ export default {
             newItemTitle: "New Item",
             editItemTitle: "Edit Item",
             updateItemTitle: "Update Item",
+
+            //pagination
+            currentPage: 1,
+            itemsPerPage: 50,
+            maxPagesShown: 5,
+
 
             // data prop of the item be edited to pass to the EditItem comp
             editItemData: {},
@@ -151,6 +184,7 @@ export default {
         // gets data from the item-list API
         async getData() {
             if (this.userStore.user.isAuthenticated) {
+                
                 axios
                     .get('/api/catalog/item-list', this.data.tableData)
                     .then(response => {
@@ -172,6 +206,7 @@ export default {
                 .catch(error => {
                     console.log(error)
                 })
+
         },
         filterTableData(params) {
             // Initialize a copy of the tableData
@@ -199,6 +234,8 @@ export default {
             }
             // Update the filteredTableData with the final result
             this.filteredTableData.tableData = filteredData;
+            // Reset current page to 1 when filters change
+            this.currentPage = 1;
         },
         // sends delete request to the back end to delete the item from the backend then updates the tableData var
         handleRemoveItem(id) {
@@ -237,7 +274,15 @@ export default {
         TableLines() {
             return this.filteredTableData.tableData.length;
         },
-
+        filteredTableDataLength() {
+            return this.filteredTableData.tableData.length;
+        },
+        paginatedTableData() {
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            const end = start + this.itemsPerPage;
+            this.paginatedTableData.tableData = this.filteredTableData.tableData.slice(start, end);
+            return this.paginatedTableData
+        },
     }
 
 }
@@ -247,4 +292,37 @@ export default {
 table {
     color: white;
 }
+
+/* .example-one .pagination-container {
+    column-gap: 10px;
+}
+
+.example-one .paginate-buttons {
+    height: 40px;
+    width: 40px;
+    border-radius: 20px;
+    cursor: pointer;
+    background-color: rgb(242, 242, 242);
+    border: 1px solid rgb(217, 217, 217);
+    color: black;
+}
+
+.example-one .paginate-buttons:hover {
+    background-color: #d8d8d8;
+}
+
+.example-one .active-page {
+    background-color: #3498db;
+    border: 1px solid #3498db;
+    color: white;
+}
+
+.example-one .active-page:hover {
+    background-color: #2988c8;
+}
+
+.example-one .back-button:active,
+.example-one .next-button:active {
+    background-color: #c4c4c4;
+} */
 </style>

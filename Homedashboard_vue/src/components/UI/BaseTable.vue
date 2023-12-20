@@ -42,11 +42,10 @@ export default {
             // Check if a sorting key is specified
             if (this.sortKey) {
                 // Use Array.prototype.sort() to sort the data based on the current key and direction
-                return this.data.tableData.slice().sort((a, b) => {
+                return this.data.tableData.sort((a, b) => {
                     const modifier = this.sortDirection;
                     const keyA = a[this.sortKey];
                     const keyB = b[this.sortKey];
-
                     if (!isNaN(keyA) && !isNaN(keyB)) {
                         // For numeric values
                         return (keyA - keyB) * modifier;
@@ -66,7 +65,7 @@ export default {
             // Format the number as currency
             const formatter = new Intl.NumberFormat('en-US', {
                 style: 'currency',
-                currency: 'USD' // Change to the appropriate currency code
+                currency: 'USD'
             });
 
             // Use the formatter to format the value
@@ -88,8 +87,6 @@ export default {
                 this.sortDirection = 1;
             }
         }
-
-
     }
 
 }
