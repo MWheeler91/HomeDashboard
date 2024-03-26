@@ -40,12 +40,16 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.AllowAllUsersModelBackend',
     'account.backends.CaseInsensitiveModelBackend'
 )
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.50.67']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.50.67', '192.168.50.66']
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173'
+    'http://localhost:5173','http://192.168.50.66:8000'
 ]
-
+CORS_ALLOW_CREDENTIALS = True
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+
+# ~~~~~~ remove before deployment
+CORS_ORIGIN_ALLOW_ALL = True
+# ~~~~~~ remove before deployment
 
 # Application definition
 

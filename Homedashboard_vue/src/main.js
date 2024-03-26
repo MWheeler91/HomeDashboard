@@ -10,7 +10,9 @@ import VueAwesomePaginate from "vue-awesome-paginate";
 import "vue-awesome-paginate/dist/style.css";
 
 
-axios.defaults.baseURL = 'http://127.0.0.1:8000';
+// axios.defaults.baseURL = 'http://127.0.0.1:8000';
+axios.defaults.baseURL = 'http://192.168.50.67:8000';
+
 const app = createApp(App);
 
 //createApp(App).mount('#app')
