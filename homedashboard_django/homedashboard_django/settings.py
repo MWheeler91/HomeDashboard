@@ -42,7 +42,7 @@ AUTHENTICATION_BACKENDS = (
 )
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.50.67', '192.168.50.66']
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173','http://192.168.50.66:8000'
+    'http://localhost:5173','http://192.168.50.67:8000'
 ]
 CORS_ALLOW_CREDENTIALS = True
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
