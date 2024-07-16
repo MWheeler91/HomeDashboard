@@ -15,9 +15,14 @@
                     :key="resetFlag" />
             </div>
             <div class="col-md-1">
-                <BaseFilterInput v-model="data.item_category" @filterChanged="updateFilter"
-                    :label="filteredTableData.tableHeaders.item_category" mode="select"
-                    :options="this.form_options.category" :theKey="this.keyValues.item_category" :key="resetFlag" />
+                <BaseFilterInput 
+                    v-model="data.item_category" 
+                    @filterChanged="updateFilter"
+                    :label="filteredTableData.tableHeaders.item_category" 
+                    mode="select"
+                    :options="this.form_options.category" 
+                    :theKey="this.keyValues.item_category" 
+                    :key="resetFlag" />
             </div>
             <div class="col-md-1">
                 <BaseFilterInput v-model="data.condition" @filterChanged="updateFilter"
@@ -98,7 +103,7 @@ export default {
                 condition: "condition",
                 room: "room",
                 value: "value",
-                serial_number: "serial_number",
+                serial_number: "serial_number",                                                                                                                                                                                                                                                                                                                                                                                                                         
                 model_number: "model_number",
                 date_entered: "date_entered",
                 entered_by: "entered_by"

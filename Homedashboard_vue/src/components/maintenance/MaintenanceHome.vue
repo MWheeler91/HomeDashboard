@@ -1,13 +1,11 @@
 <template>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12">
-                <InsuranceFilter :filteredTableData="this.filteredTableData" :form_options="this.form_options"
-                    @filterChanged="filterTableData" @resetFilters="resetFilters" />
-
+            <div class=" col-md-12">
+                <MaintenanceFilter :filteredTableData="this.filteredTableData" :form_options="this.form_options"
+                @filterChanged="filterTableData" @resetFilters="resetFilters" />
             </div>
         </div>
-        <hr>
 
 
         <div class="row">
@@ -27,7 +25,6 @@
         </div>
 
 
-
         <popup v-if="popupTriggers.buttonTrigger">
             <NewItem :title="this.newItemTitle" :form_options="this.form_options"
                 :togglePopup="() => TogglePopup('buttonTrigger')" @getData="getData()" />
@@ -38,20 +35,12 @@
         </popup>
 
 
-        <!-- <vue-awesome-paginate :total-items="filteredTableLines" :items-per-page="itemsPerPage"
-            :max-pages-shown="maxPagesShown" v-model="currentPage" /> -->
-
         <div class="col-md-12">
             <BaseTable :data="paginatedTableData" @delete-item="handleRemoveItem" @update-row="handelUpdateRow"
                 :key="resetFlag" />
         </div>
 
 
-
-        <!-- <div class="col-md-12">
-            <BaseTable :data="this.filteredTableData" @delete-item="handleRemoveItem" @update-row="handelUpdateRow"
-                :key="resetFlag" />
-        </div> -->
 
     </div>
 </template>
@@ -61,69 +50,59 @@ import { ref } from "vue";
 import { useUserStore } from '@/store/user'
 import axios from "axios";
 
-import NewItem from "@/components/insurance/NewItem.vue";
-import EditItem from "@/components/insurance/EditItem.vue";
-import InsuranceFilter from "@/components/insurance/InsuranceFilter.vue";
+import NewItem from "@/components/maintenance/NewItem.vue";
+import EditItem from "@/components/maintenance/EditItem.vue";
+import MaintenanceFilter from "@/components/maintenance/MaintenanceFilter.vue";
 
-// may not use these
-//import AppCard from "@/components/apps/AppCard.vue";
-//mport AppCardWrapper from "@/components/apps/AppCardWrapper.vue";
+
 
 import BaseTable from "@/components/UI/BaseTable.vue";
 import Popup from "@/components/UI/Popup.vue";
 
-
 export default {
-    name: 'InsuranceHome',
+    name: 'MaintenanceHome',
     components: {
         BaseTable,
-        InsuranceFilter,
+        MaintenanceFilter,
         Popup,
         NewItem,
         EditItem,
-        axios,
-
     },
-    data() {
+    data () {
         return {
-            // Data for the table
             data: {
                 tableHeaders: {
-                    id: "Item ID",
-                    item_name: "Item Name",
-                    item_description: "Item Description",
-                    item_category: "Category",
-                    condition: "Condition",
-                    room: "Room",
-                    value: "Value",
-                    serial_number: "Serial Number",
-                    model_number: "Model Number",
-                    date_entered: "Date Entered",
-                    entered_by: "Entered By"
+                    id: "ID",
+                    vehicle: "Vehicle",
+                    category: "Category",
+                    short_description: "Short Description",
+                    maintenance_preformed: "Work Preformed",
+                    mileage: "Mileage",
+                    cost: "Cost",
+                    date_preformed: "Date",
+                    next_service: "Next Service Date",
                 },
                 tableData: []
             },
             filteredTableData: {
                 tableHeaders: {
-                    id: "Item ID",
-                    item_name: "Item Name",
-                    item_description: "Item Description",
-                    item_category: "Category",
-                    condition: "Condition",
-                    room: "Room",
-                    value: "Value",
-                    serial_number: "Serial Number",
-                    model_number: "Model Number",
-                    date_entered: "Date Entered",
-                    entered_by: "Entered By"
+                    id: "ID",
+                    vehicle: "Vehicle",
+                    category: "Category",
+                    short_description: "Short Description",
+                    maintenance_preformed: "Work Preformed",
+                    mileage: "Mileage",
+                    cost: "Cost",
+                    date_preformed: "Date",
+                    next_service: "Next Service Date",
                 },
                 tableData: []
             },
             form_options: {
-                category: [],
-                room: [],
-                condition: [],
+                vehicles: [],
+                categories: []
             },
+            vehicleStrings: [],
             resetFlag: 0,
             newItemTitle: "New Item",
             editItemTitle: "Edit Item",
@@ -138,7 +117,6 @@ export default {
             // data prop of the item be edited to pass to the EditItem comp
             editItemData: {},
             // data prop for filtering the table
-
         }
     },
     setup() {
@@ -159,7 +137,6 @@ export default {
             userStore
         }
     },
-    // Calls getData to fill table data var.
     mounted() {
         this.getData()
     },
@@ -168,7 +145,7 @@ export default {
         async getData() {
             if (this.userStore.user.isAuthenticated) {
                 axios
-                    .get('/api/catalog/item-list', this.data.tableData)
+                    .get('/api/maintenance/maintenance-list', this.data.tableData)
                     .then(response => {
                         this.data.tableData = response.data
                         this.filteredTableData.tableData = response.data
@@ -179,16 +156,14 @@ export default {
                     })
             }
             axios
-                .get('api/catalog/get-values')
+            .get('api/maintenance/get-values')
                 .then((response) => {
-                    this.form_options.category = response.data.category
-                    this.form_options.room = response.data.room
-                    this.form_options.condition = response.data.condition
+                    this.form_options.vehicles = response.data.vehicle
+                    this.form_options.categories = response.data.category
                 })
                 .catch(error => {
                     console.log(error)
                 })
-
         },
         filterTableData(params) {
             // Initialize a copy of the tableData
@@ -218,10 +193,9 @@ export default {
             // Reset current page to 1 when filters change
             this.currentPage = 1;
         },
-        // sends delete request to the back end to delete the item from the backend then updates the tableData var
         handleRemoveItem(id) {
             axios
-                .delete('/api/catalog/delete-item/' + id)
+                .delete('/api/maintenance/delete-maintenance/' + id)
                 .then((response) => {
                     console.log(response.data)
                 })
@@ -261,17 +235,15 @@ export default {
         paginatedTableData() {
             let paginatedTableData =  {
                 tableHeaders: {
-                    id: "Item ID",
-                    item_name: "Item Name",
-                    item_description: "Item Description",
-                    item_category: "Category",
-                    condition: "Condition",
-                    room: "Room",
-                    value: "Value",
-                    serial_number: "Serial Number",
-                    model_number: "Model Number",
-                    date_entered: "Date Entered",
-                    entered_by: "Entered By"
+                    id: "ID",
+                    vehicle: "Vehicle",
+                    category: "Category",
+                    short_description: "Short Description",
+                    maintenance_preformed: "Work Preformed",
+                    mileage: "Mileage",
+                    cost: "Cost",
+                    date_preformed: "Date",
+                    next_service: "Next Service Date"
                 },
                 tableData: []
             }
@@ -282,10 +254,9 @@ export default {
         },
     }
 }
+
 </script>
 
-<style scoped>
-table {
-    color: white;
-}
+<style scoped >
+
 </style>

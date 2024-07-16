@@ -11,6 +11,16 @@ def maintenance_file_upload_path(instance, filename):
     vehicle_folder = f"uploads/maintenance_files/{instance.maintenance.vehicle}/"
     return os.path.join(vehicle_folder, filename)
 
+class Category(models.Model):
+    category = models.CharField(max_length=200, unique=True)
+
+    def __str__(self):
+        return "{}".format(self.category)
+        
+    class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+
 
 class Vehicle(models.Model):
     year = models.IntegerField()
@@ -33,10 +43,12 @@ class Vehicle(models.Model):
         return f"{self.year} {self.make} {self.model}"
 
 
+
 class Maintenance(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
     mileage = models.IntegerField()
-    short_description = models.CharField(max_length=50)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    short_description = models.CharField(max_length=50, default="")
     maintenance_performed = models.TextField()
     cost = models.DecimalField(max_digits=100, decimal_places=2)
     date_performed = models.DateField(default=datetime.now)
@@ -51,7 +63,7 @@ class Maintenance(models.Model):
     # part details ( part used / part number )
 
     def __str__(self):
-        return f"{self.vehicle} - {self.short_description}"
+        return f"{self.vehicle} - {self.category} - {self.short_description}"
     
     class Meta:
         verbose_name = "Maintenance"

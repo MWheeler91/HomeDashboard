@@ -13,7 +13,8 @@
             <tbody>
                 <tr v-for="(row, index) in sortedTableData" :key="index">
                     <td v-for="(value, key) in row" :key="key">
-                        <span v-if="key === 'value' || key === 'cost'">{{ formatCurrency(row.value) }}</span>
+                        <!-- Desite cost being lowercase everywhere key === cost isn't working -->
+                        <span v-if="key === 'value' || key === 'Cost'">{{ formatCurrency(row.value) }}</span>
                         <span v-else>{{ value }}</span>
                     </td>
                     <td>
