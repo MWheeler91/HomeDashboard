@@ -106,7 +106,7 @@ export default {
 .flex-container {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: center;
     /*margin-right: 50px;*/
     height: auto;
     width: 150px;

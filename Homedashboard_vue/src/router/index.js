@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from '@/components/HomePage.vue'
 import InsuranceHome from '@/components/insurance/InsuranceHome.vue'
+import MaintenanceHome from '@/components/maintenance/MaintenanceHome.vue'
 // import store from '../store'
 import { useUserStore } from '@/store/user'
 
@@ -22,6 +23,14 @@ const index = createRouter({
       path: '/insurance-db',
       name: 'InsuranceHome',
       component: InsuranceHome,
+      meta: {
+        requireLogin: true
+      }
+    },
+    {
+      path: '/maintenance-db',
+      name: 'MaintenanceHome',
+      component: MaintenanceHome,
       meta: {
         requireLogin: true
       }

@@ -1,6 +1,6 @@
 <template>
 
-    <div class="container main">
+    <div class="container-fluid">
         <div class="row center-screen">
             <div class="col-sm-12">
                 <the-apps />
@@ -45,12 +45,12 @@ export default {
 </script>
 
 <style>
-.center-screen {
+/* .center-screen {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 10%;
-}
+} */
 
 body {
     background-color: #0f0f0f;

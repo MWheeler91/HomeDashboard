@@ -29,7 +29,7 @@ class DefaultAdmin(admin.ModelAdmin):
 
 
 
-
+admin.site.register(Category)
 admin.site.register(Vehicle, DefaultAdmin)
 admin.site.register(Maintenance, DefaultAdmin)
 admin.site.register(MaintenanceFile)

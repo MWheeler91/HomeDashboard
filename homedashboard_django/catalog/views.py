@@ -19,7 +19,7 @@ class GetValues(APIView):
         room_serializer = RoomSerializer(rooms, many=True)
         condition_serializer = ConditionSerializer(condition, many=True)
         category_serializer = CategorySerializer(category, many=True)
-
+        
         room_list = [item["room"] for item in room_serializer.data]
         condition_list = [item["condition"] for item in condition_serializer.data]
         category_list = [item["item_category"] for item in category_serializer.data]
