@@ -17,18 +17,28 @@
             <div class="">
                 <vue-awesome-paginate :total-items="filteredTableLines" :items-per-page="itemsPerPage"
                     :max-pages-shown="maxPagesShown" v-model="currentPage" />
-
-                <button class="btn btn-primary mt-3 float-end" @click="() => TogglePopup('buttonTrigger')">
+                
+                <button class="btn btn-primary m-3 float-end" @click="() => TogglePopup('buttonTrigger')">
                     New Item
+                </button>
+                
+                <button class="btn btn-primary m-3 float-end" @click="() => TogglePopup('buttonTrigger')">
+                    New Vehicle
                 </button>
             </div>
         </div>
 
 
         <popup v-if="popupTriggers.buttonTrigger">
-            <NewItem :title="this.newItemTitle" :form_options="this.form_options"
+            <NewMaintenance :title="this.newMaintenanceTitle" :form_options="this.form_options"
                 :togglePopup="() => TogglePopup('buttonTrigger')" @getData="getData()" />
         </popup>
+
+        <popup v-else-if="popupTriggers.newVehicle">
+            <NewVehicle :title="this.newVehicleTitle" :form_options="this.form_options"
+                :togglePopup="() => TogglePopup('newVehicle')" @getData="getData()" />
+        </popup>
+
         <popup v-else-if="popupTriggers.editTrigger">
             <EditItem :title="this.editItemTitle" :form_options="this.form_options" :data="this.editItemData"
                 @getData="getData()" :togglePopup="() => TogglePopup('editTrigger')" />
@@ -50,11 +60,10 @@ import { ref } from "vue";
 import { useUserStore } from '@/store/user'
 import axios from "axios";
 
-import NewItem from "@/components/maintenance/NewItem.vue";
+import NewMaintenance from "@/components/maintenance/NewMaintenance.vue";
+import NewVehicle from "@/components/maintenance/NewVehicle.vue";
 import EditItem from "@/components/maintenance/EditItem.vue";
 import MaintenanceFilter from "@/components/maintenance/MaintenanceFilter.vue";
-
-
 
 import BaseTable from "@/components/UI/BaseTable.vue";
 import Popup from "@/components/UI/Popup.vue";
@@ -65,9 +74,30 @@ export default {
         BaseTable,
         MaintenanceFilter,
         Popup,
-        NewItem,
+        NewMaintenance,
+        NewVehicle,
         EditItem,
     },
+
+    setup() {
+        const userStore = useUserStore()
+        const popupTriggers = ref({
+            buttonTrigger: false,
+            newVehicle: false,
+            timedTrigger: false
+        });
+
+        const TogglePopup = (trigger) => {
+            popupTriggers.value[trigger] = !popupTriggers.value[trigger]
+        }
+        return {
+            popupTriggers,
+            TogglePopup,
+            userStore
+        }
+    },
+
+
     data () {
         return {
             data: {
@@ -100,11 +130,13 @@ export default {
             },
             form_options: {
                 vehicles: [],
-                categories: []
+                category: []
             },
             vehicleStrings: [],
             resetFlag: 0,
-            newItemTitle: "New Item",
+            newMaintenanceTitle: "New Maintenance Item",
+            newVehicleTitle: "New Vehicle Item",
+
             editItemTitle: "Edit Item",
             updateItemTitle: "Update Item",
 
@@ -149,7 +181,6 @@ export default {
                     .then(response => {
                         this.data.tableData = response.data
                         this.filteredTableData.tableData = response.data
-                        console.log(response.data)
                     })
                     .catch(error => {
                         console.log(error)
@@ -159,7 +190,7 @@ export default {
             .get('api/maintenance/get-values')
                 .then((response) => {
                     this.form_options.vehicles = response.data.vehicle
-                    this.form_options.categories = response.data.category
+                    this.form_options.category = response.data.category
                 })
                 .catch(error => {
                     console.log(error)
@@ -197,7 +228,6 @@ export default {
             axios
                 .delete('/api/maintenance/delete-maintenance/' + id)
                 .then((response) => {
-                    console.log(response.data)
                 })
                 .catch(error => {
                     console.log(error)

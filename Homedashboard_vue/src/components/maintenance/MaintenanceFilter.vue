@@ -10,21 +10,21 @@
                 <BaseFilterInput 
                     v-model="data.vehicle" 
                     @filterChanged="updateFilter" 
+                    :label="filteredTableData.tableHeaders.vehicle" 
                     mode="select" 
                     :options="this.form_options.vehicles"
-                    :label="filteredTableData.tableHeaders.vehicle" 
-                    :theKey="keyValues.vehicle" 
+                    :theKey="this.keyValues.vehicle" 
                     :key="resetFlag" />
             </div>
 
             <div class="col-md-1">
                 <BaseFilterInput 
                     v-model="data.category" 
-                    @filterChanged="updateFilter" 
-                    mode="select" 
-                    :options="this.form_options.categories"
+                    @filterChanged="updateFilter"
                     :label="filteredTableData.tableHeaders.category" 
-                    :theKey="keyValues.category" 
+                    mode="select" 
+                    :options="this.form_options.category"
+                    :theKey="this.keyValues.category" 
                     :key="resetFlag" />
             </div>
 
@@ -88,15 +88,15 @@ export default {
     data() {
         return {
             data: {
-                id: "",
-                vehicle: "",
-                category: "",
-                short_description: "",
-                maintenance_preformed: "",
-                mileage: "",
-                cost: "",
-                date_preformed: "",
-                next_service: ""
+                id: '',
+                vehicle: '',
+                category: '',
+                short_description: '',
+                maintenance_preformed: '',
+                mileage: '',
+                cost: '',
+                date_preformed: '',
+                next_service: ''
             },
             keyValues: {
                 id: "id",
@@ -110,15 +110,15 @@ export default {
                 next_service: "next_service"
             },
             empty_data: {
-                id: "",
-                vehicle: "",
-                category: "",
-                short_description: "",
-                maintenance_preformed: "",
-                mileage: "",
-                cost: "",
-                date_preformed: "",
-                next_service: ""
+                id: '',
+                vehicle: '',
+                category: '',
+                short_description: '',
+                maintenance_preformed: '',
+                mileage: '',
+                cost: '',
+                date_preformed: '',
+                next_service: ''
             },
             resetFlag: 0,
         };

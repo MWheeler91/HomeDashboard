@@ -54,6 +54,7 @@ class MaintenanceSerializer(serializers.ModelSerializer):
             "cost",
             "date_performed",
             "next_service_date",
+
         ]
     def get_entered_by(self, obj):
         return obj.entered_by.first_name
@@ -64,6 +65,23 @@ class MaintenanceSerializer(serializers.ModelSerializer):
         queryset = queryset.select_related('vehicle', 'category')
         # print(queryset)
         return queryset
+
+class NewMaintenanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Maintenance
+        fields = [
+            "vehicle",
+            "category",
+            "short_description",
+            "maintenance_performed",
+            "cost",
+            "mileage",
+            "date_performed",
+            "next_service_date",
+            "entered_by"
+            
+        ]
+
 
 class MaintenanceFileSerializer(serializers.ModelSerializer):
     class Meta:
