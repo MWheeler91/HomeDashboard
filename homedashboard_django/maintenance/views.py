@@ -37,7 +37,7 @@ class GetValues(APIView):
             "vehicle": vehicle_list,
             "category": category_list
         }
-        print(data)
+        #print(data)
         return Response(data)
 
 class GetMaintenanceList(APIView):
@@ -69,3 +69,36 @@ class DeleteMaintenance(APIView):
         return Response(
             {"message": "Item deleted successfully"}, status=status.HTTP_200_OK
         )
+
+class NewMaintenance(APIView):
+    def post(self, request):
+        print(request.data)
+        try:
+            the_vehicle = request.data["vehicle"].split()
+
+            vehicle_id = Vehicle.objects.get(
+                year=int(the_vehicle[0]),
+                make=the_vehicle[1],
+                model=the_vehicle[2]
+                )
+        except Vehicle.DoesNotExist:
+            raise NotFound("Vehicle not found.")
+        except ValueError:
+            raise NotFound("Invalid vehicle year format.")            
+
+
+        category_id = Category.objects.get(category=request.data["category"])
+
+        request.data["vehicle"] = vehicle_id.id
+        request.data["category"] = category_id.id
+
+        serializer = NewMaintenanceSerializer(data=request.data)
+        print(serializer)
+        if serializer.is_valid():
+            print("serializer is good")
+        else:
+            print("it's bad")
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

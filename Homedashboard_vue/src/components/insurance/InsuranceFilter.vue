@@ -25,9 +25,14 @@
                     :key="resetFlag" />
             </div>
             <div class="col-md-1">
-                <BaseFilterInput v-model="data.condition" @filterChanged="updateFilter"
-                    :label="filteredTableData.tableHeaders.condition" mode="select" :options="this.form_options.condition"
-                    :theKey="this.keyValues.condition" :key="resetFlag" />
+                <BaseFilterInput 
+                    v-model="data.condition" 
+                    @filterChanged="updateFilter"
+                    :label="filteredTableData.tableHeaders.condition" 
+                    mode="select" 
+                    :options="this.form_options.condition"
+                    :theKey="this.keyValues.condition" 
+                    :key="resetFlag" />
             </div>
             <div class="col-md-1">
                 <BaseFilterInput v-model="data.room" @filterChanged="updateFilter"
