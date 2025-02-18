@@ -17,7 +17,7 @@ from django_filters import rest_framework
 
 env = environ.Env(
     # set casting, default value
-    DEBUG=(bool, False)
+    DEBUG_PROD=(bool, False)
 )
 
 
@@ -33,8 +33,13 @@ SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = True
-DEBUG = env('DEBUG')
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.50.67']
+DEBUG = env('DEBUG_PROD')
+AUTH_USER_MODEL = 'account.User'
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.AllowAllUsersModelBackend',
+    'account.backends.CaseInsensitiveModelBackend'
+)
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.50.67', 'homedashboard.django001']
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173'
 ]
@@ -59,6 +64,8 @@ INSTALLED_APPS = [
     'apps',
     'account',
     'catalog',
+    'maintenance'
+
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -178,3 +185,22 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated'
     )
 }
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+

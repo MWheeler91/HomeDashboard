@@ -40,7 +40,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.AllowAllUsersModelBackend',
     'account.backends.CaseInsensitiveModelBackend'
 )
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.50.67', '192.168.50.66']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.50.67', '192.168.50.66', 'django001']
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173','http://192.168.50.67:8000'
 ]
@@ -120,8 +120,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': env('DB_NAME_TEST'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
+        'USER': env('DB_USER_TEST'),
+        'PASSWORD': env('DB_PASSWORD_TEST'),
         'HOST': env('DB_HOST'),
         'PORT': env('DB_PORT'),
     },

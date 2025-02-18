@@ -63,7 +63,7 @@ class Maintenance(models.Model):
     # part details ( part used / part number )
 
     def __str__(self):
-        return f"{self.vehicle} - {self.category} - {self.short_description}"
+        return f"{self.date_performed.strftime('%m/%d/%Y')} - {self.vehicle} - {self.category} - {self.short_description}"
     
     class Meta:
         verbose_name = "Maintenance"
