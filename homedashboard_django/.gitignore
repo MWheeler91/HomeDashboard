@@ -1,3 +1,4 @@
-.env
+*venv*/
 media/
-venv2/
+venv/
+homedashboard_django/settingsprod.py
