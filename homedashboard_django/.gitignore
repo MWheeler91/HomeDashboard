@@ -1,4 +1,5 @@
 *venv*/
+.gitignore
 media/
 venv/
 homedashboard_django/settingsprod.py
