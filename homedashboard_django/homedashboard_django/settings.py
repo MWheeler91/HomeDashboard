@@ -163,7 +163,7 @@ PASSWORD_HASHERS = [
 LANGUAGE_CODE = 'en-us'
 USE_I18N = True
 USE_TZ = True
-TIME_ZONE = 'US/Central'
+TIME_ZONE = 'America/Regina'
 
 
 

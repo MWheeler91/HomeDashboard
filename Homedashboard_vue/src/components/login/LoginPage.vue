@@ -60,54 +60,55 @@ export default {
     },
     methods: {
         async submitForm() {
-            this.errors = []
-            if (this.data.email === '') {
-                this.errors.push('Your e-mail is missing')
-            }
+            this.errors = [];
 
-            if (this.data.password === '') {
-                this.errors.push('Your password is missing')
-            }
+            if (!this.data.email) this.errors.push('Your e-mail is missing')
+            if (!this.data.password) this.errors.push('Your password is missing')
 
+            if (this.errors.length > 0) return
 
-            if (this.errors.length === 0) {
-                await axios
-                    .post('/api/account/login/', this.data)
-                    .then(response => {
-                        this.userStore.setToken(response.data)
-                        axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.access;
-                    })
-                    .catch(error => {
-                        if (error == "AxiosError: Network Error") {
-                            this.errors.push("Network Error:  Unable to connect to server!  Please try again later.")
-                        } else {
-                            this.errors.push('Authentication Error: The email or password is incorrect or the user is not activated!')
-                        }
-                    })
-                if (this.errors.length === 0) {
-                    await axios
-                        .get('/api/account/me/')
-                        .then(response => {
-                            this.userStore.setUserInfo(response.data)
-                        })
-                        .catch(error => {
-                            if (error == "AxiosError: Network Error") {
-                                this.errors.push("Network Error:  Unable to connect to server!  Please try again later.")
-                            } else {
-                                this.errors.push('Authentication Error: The email or password is incorrect or the user is not activated!')
-                            }
-                        })
-                }
-                if (this.errors.length === 0) {
-                    this.$emit('togglePopup')
-                    this.reloadPage()
+            try {
+                // 1. Attempt Login
+                const response = await axios.post('/api/account/login/', this.data);
+                this.userStore.setToken(response.data);
+
+                // Ensure the token is retrieved correctly
+                const token = this.userStore.user.access || localStorage.getItem("user.access");
+                console.log("Retrieved Token:", token);
+
+                if (!token) {
+                    console.error("No token found! Unauthorized request.");
+                    this.errors.push("Authentication Error: Missing token. Please log in again.");
+                    return;
                 }
 
+                axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+                // 2. Fetch User Info
+                const userResponse = await axios.get('/api/account/me/', {
+                    headers: { 
+                        Authorization: `Bearer ${token}`, 
+                        "X-CSRFToken": document.cookie.split('csrftoken=')[1]?.split(';')[0] || "" 
+                    },
+                    withCredentials: true
+                });
+
+                this.userStore.setUserInfo(userResponse.data);
+
+                // 3. Close Popup & Reload Page
+                this.$emit('togglePopup');
+                this.reloadPage();
+            } catch (error) {
+                if (error.message.includes("Network Error")) {
+                    this.errors.push("Network Error: Unable to connect to server! Please try again later.");
+                } else {
+                    this.errors.push("Authentication Error: The email or password is incorrect or the user is not activated!");
+                }
             }
         },
         resetData() {
             this.data = {
-                username: "",
+                email: "",
                 password: ""
             }
         },

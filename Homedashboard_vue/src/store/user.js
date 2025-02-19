@@ -37,7 +37,7 @@ export const useUserStore = defineStore({
         },
 
         setToken(data) {
-            console.log('setToken', data)
+            console.log("setToken Called, Token Data:", data)
 
             this.user.access = data.access
             this.user.refresh = data.refresh
@@ -46,7 +46,7 @@ export const useUserStore = defineStore({
             localStorage.setItem('user.access', data.access)
             localStorage.setItem('user.refresh', data.refresh)
 
-            console.log('user.access: ', localStorage.getItem('user.access'))
+            console.log("Stored Token in localStorage:", localStorage.getItem("user.access"))
         },
 
         removeToken() {
