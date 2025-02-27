@@ -71,11 +71,13 @@ INSTALLED_APPS = [
     'django_filters',
     'crispy_forms',
     'crispy_bootstrap4',
+    'django_celery_beat',
 
     'apps',
     'account',
     'catalog',
-    'maintenance'
+    'maintenance',
+    'email_mgt'
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -199,4 +201,30 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated'
     ),
     'DATETIME_FORMAT': "%Y-%m-%d %H:%M"
+}
+
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Use Redis as the broker
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': 'error_log.txt',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
 }
