@@ -13,7 +13,7 @@ import environ
 import datetime, timedelta
 from models import DKIM, DKIM_Record
 import logging
-
+from error_logging.logger import ErrorLogger
 # logging
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,8 @@ def create_dkim_record(dkim, source_ip, record_type, domain, selector, result):
             result=result,
         )
     except Exception as e:
-        logger.error(f"Error processing DMARC report: {e}")
+        ErrorLogger().log_error(user=None, app="email_mgt", funct="create_dkim_record", file="task.py", error=str(e))
+
         
 def save_xml_to_db(xml_data):
     try:
@@ -79,7 +80,7 @@ def save_xml_to_db(xml_data):
                 }
             )
         except Exception as e:
-            logger.error(f"Error creating DKIM record: {e}")
+            ErrorLogger().log_error(user=None, app="email_mgt", funct="save_xml_to_db", file="task.py", error=str(e))
             return
 
         
@@ -104,7 +105,7 @@ def save_xml_to_db(xml_data):
            
         return 0
     except Exception as e:
-        logger.error(f"Error processing DMARC report: {e}")
+        ErrorLogger().log_error(user=None, app="email_mgt", funct="save_xml_to_db", file="task.py", error=str(e))
         return 1
 
 
@@ -112,13 +113,9 @@ def save_xml_to_db(xml_data):
 def fetch_dmarc_reports():
     try:
         # Search for unread emails with "DMARC" in the subject
-        query = f'is:unread subject:"DMARC" after:{twenty_four_hours_ago}'
+        query = f'label:"DMARC" after:{twenty_four_hours_ago}'
         results = service.users().messages().list(userId="me", q=query).execute()
         messages = results.get("messages", [])
-
-        summary_reports = []
-
-        
 
         for msg in messages:
             err = 0 # Error counter
@@ -144,4 +141,4 @@ def fetch_dmarc_reports():
 
 
     except Exception as e:
-        logger.error(f"Error processing DMARC report: {e}")
+        ErrorLogger().log_error(user=None, app="email_mgt", funct="fetch_dmarc_reports", file="task.py", error=str(e))

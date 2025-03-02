@@ -86,7 +86,8 @@ INSTALLED_APPS = [
     'account',
     'catalog',
     'maintenance',
-    'email_mgt'
+    'email_mgt',
+    'error_logging'
 
 ]
 
@@ -215,25 +216,40 @@ REST_FRAMEWORK = {
 }
 
 
+# ----------------------- Celery -----------------------
 CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Use Redis as the broker
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
+# ----------------------- Logging -----------------------
+LOGGING_DIR = os.path.join(BASE_DIR, 'logs')
+
+os.makedirs(LOGGING_DIR, exist_ok=True)
+
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': 'error_log.txt',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "file": {
+            "level": "ERROR",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(LOGGING_DIR, "django_error.log"),  # Path to your error log file
+        },
+        "console": {
+            "level": "ERROR",
+            "class": "logging.StreamHandler",
         },
     },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'ERROR',
-            'propagate': True,
+    "loggers": {
+        "django": {
+            "handlers": ["file", "console"],
+            "level": "ERROR",
+            "propagate": True,
+        },
+        "error_logger": {
+            "handlers": ["file", "console"],
+            "level": "ERROR",
+            "propagate": False,
         },
     },
 }
