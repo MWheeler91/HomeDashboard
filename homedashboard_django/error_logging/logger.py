@@ -2,10 +2,12 @@ import logging
 import traceback
 from django.db.utils import IntegrityError, OperationalError
 from .models import Error, StackTrace
-from django.contrib.auth.models import User
+from account.models import User
 from django.utils.timezone import now
+from django.db import transaction
 import csv
 import inspect
+import os
 
 """
 Purpose: Manage all error logging in 1 file
@@ -21,6 +23,12 @@ Purpose: Manage all error logging in 1 file
 
 logger = logging.getLogger("error_logger")
 
+def serialize_argument(arg):
+    try:
+        return str(arg)
+    except Exception:
+        return "Error Parsing Parameters"
+
 class ErrorLogger:
     @staticmethod
     def log_error(user, app, file, funct, error, stack_trace, sys_user="SYS", error_type='Exception'):
@@ -28,26 +36,30 @@ class ErrorLogger:
             frame = inspect.currentframe().f_back  # Get the caller's frame
             call_args = inspect.getargvalues(frame)  # Get arguments passed to the calling function
             
-            func_args_dict = {arg: call_args.locals[arg] for arg in call_args.args}
+            func_args_list = {arg: serialize_argument(call_args.locals[arg]) for arg in call_args.args}
 
             user_obj = ErrorLogger.get_user(sys_user if not user else user)
 
-            # Attempt to log to the database
-            err = Error.objects.create(
-                app = app,
-                funct = funct,
-                file = file,
-                error =str (error),
-                error_type = error_type,
-                user = user_obj
-            )
-            if stack_trace is not None:
-                ErrorLogger.log_trace(err, stack_trace, func_args_dict)
+            try:
+                with transaction.atomic():
+                    err = Error.objects.create(
+                        app = app,
+                        funct = funct,
+                        file = file,
+                        error =str (error),
+                        error_type = error_type,
+                        user = user_obj
+                    )
+                    if stack_trace is not None:
+                        ErrorLogger.log_trace(err, stack_trace, func_args_list)
+            except Exception as e:
+                logger.error(f"Error logging to DB failed: {e}")
+                logger.error(f"Error details: {traceback.format_exc()}")
 
         except (IntegrityError, OperationalError) as db_error:
             # logger.error(f"Database error while logging error: {db_error}")
             ErrorLogger.write_to_file(user, app, file, funct, error, error_type)
-            ErrorLogger.write_to_file(user, app, file, funct, db_error, 'DB_Error')
+            ErrorLogger.write_to_file(user, app, file, funct, str(db_error), 'DB_Error')
 
         except Exception as e:
             # logger.error(f"Unexpected error during logging: {e}")
@@ -55,22 +67,22 @@ class ErrorLogger:
             ErrorLogger.write_to_file(user, app, file, funct, error, error_type)
 
     @staticmethod
-    def log_trace(err, stack_trace, func_args_dict):
+    def log_trace(err, stack_trace, func_args_list):
         try:
             trace_level = ErrorLogger.get_trace_level(stack_trace)
             StackTrace.objects.create (
                 error_id = err,
                 stack_trace = str(stack_trace),
-                additional_data = func_args_dict,
+                additional_data = func_args_list,
                 trace_level = trace_level
             )
         except (IntegrityError, OperationalError) as db_error:
             # logger.error(f"Database error while logging error: {db_error}")
-            ErrorLogger.write_to_file('SYS', 'Error_mgt', 'logger.py', 'log_trace', db_error, 'DB_Error')
+            ErrorLogger.write_to_file('SYS', 'Error_mgt', 'logger.py', 'log_trace', str(db_error), 'DB_Error')
         except Exception as e:
             # logger.error(f"Unexpected error during logging: {e}")
             # logger.error(f"Error details: {traceback.format_exc()}")
-            ErrorLogger.write_to_file('SYS', 'Error_mgt', 'logger.py', 'log_trace', db_error, 'Exception')
+            ErrorLogger.write_to_file('SYS', 'Error_mgt', 'logger.py', 'log_trace', str(e), 'Exception')
 
     @staticmethod
     def get_user(user):
@@ -88,7 +100,11 @@ class ErrorLogger:
 
     @staticmethod
     def write_to_file(user, app, file, funct, error, error_type):
-        log_file_path = "logs/error_log_fallback.csv"  
+        log_dir = "logs"
+        log_file_path = os.path.join(log_dir, "error_log_fallback.csv")
+
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir) 
         try:
             with open(log_file_path, mode='a', newline='') as log_file:
                 csv_writer = csv.writer(log_file)
