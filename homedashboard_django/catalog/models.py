@@ -64,7 +64,8 @@ class Item(models.Model):
 
 
 class ItemAccessories(models.Model):
-    Item = models.ForeignKey(Item, limit_choices_to={'has_accessories':True}, on_delete=models.SET_NULL, blank=True, null=True)
+    item = models.ForeignKey(Item, limit_choices_to={'has_accessories':True}, on_delete=models.SET_NULL, blank=True, null=True)
+    name = models.CharField(max_length=200)
     purchase_price = models.DecimalField(max_digits=100, decimal_places=2, blank=True, null=True)
     purchase_date = models.DateField(blank=True, null=True)
     value_now = models.DecimalField(max_digits=100, decimal_places=2, blank=True, null=True)
@@ -77,3 +78,6 @@ class ItemAccessories(models.Model):
     last_updated_date = models.DateField(auto_now=True, blank=True, null=True)
     last_updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
     last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return f"{self.id}: {self.item.item_name} - {self.name}"
