@@ -1,6 +1,0 @@
-user,app,file,funct,error,error_type,timestamp
-SYS,catalog,models.py,Item.save,"Cannot resolve keyword 'Item' into field. Choices are: date_entered, entered_by, entered_by_id, extra, id, is_active, item, item_id, last_updated_by, last_updated_by_id, last_updated_date, last_updated_time, model_number, name, purchase_date, purchase_price, serial_number, value_now",Exception,2025-03-04 04:10:14.610079+00:00
-SYS,catalog,models.py,Item.save,"Cannot resolve keyword 'Item' into field. Choices are: date_entered, entered_by, entered_by_id, extra, id, is_active, item, item_id, last_updated_by, last_updated_by_id, last_updated_date, last_updated_time, model_number, name, purchase_date, purchase_price, serial_number, value_now",Exception,2025-03-04 04:19:20.048636+00:00
-SYS,Error_mgt,logger.py,log_trace,Object of type Item is not JSON serializable,Exception,2025-03-04 04:33:00.870668+00:00
-SYS,Error_mgt,logger.py,log_trace,Object of type Item is not JSON serializable,Exception,2025-03-04 04:36:15.292251+00:00
-SYS,Error_mgt,logger.py,log_trace,Object of type ModelState is not JSON serializable,Exception,2025-03-04 04:41:58.441930+00:00
