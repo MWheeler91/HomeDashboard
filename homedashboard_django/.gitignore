@@ -1,9 +1,18 @@
-*venv*/
-.env
-media/
-venv/
+# Virtual ENV
+venv*/
+
+# Django Settings / ENV
 homedashboard_django/settingsprod.py
-homedashboard-django-f66383edda57.json
+.env
+
+# Media / Static / ETC
 error_log.txt
 logs/
 staticfiles/
+media/
+
+# Other Config
+homedashboard-django-f66383edda57.json
+
+# Linx specific
+*.swp

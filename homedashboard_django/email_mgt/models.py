@@ -17,7 +17,7 @@ class DKIM(models.Model):
     adkim=models.CharField(max_length=1, blank=True, null=True)
     aspf=models.CharField(max_length=1, blank=True, null=True)
     dkim_policy=models.CharField(max_length=10, blank=True, null=True)
-    
+    is_processed = models.BooleanField(default=False)
     entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='dkim_entered_by')
     date_entered = models.DateField(default=datetime.now)
     last_updated_date = models.DateField(auto_now=True, blank=True, null=True)
