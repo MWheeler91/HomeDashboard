@@ -9,6 +9,7 @@ admin.site.register(Category)
 admin.site.register(Condition)
 
 class ItemAccessoriesAdmin(admin.ModelAdmin):
+
     formfield_overrides = {
         JSONField: {'widget': JSONEditorWidget},
     }
@@ -29,6 +30,10 @@ class ItemAccessoriesAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 class ItemAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        JSONField: {'widget': JSONEditorWidget},
+    }
+
     readonly_fields = (
         'entered_by',
         'date_entered',
