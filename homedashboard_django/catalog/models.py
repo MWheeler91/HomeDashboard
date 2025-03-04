@@ -62,7 +62,8 @@ class Item(models.Model):
         is_new = self._state.adding
         super().save(*args, **kwargs)
         if not is_new: 
-            ItemAccessories.objects.filter(Item=self).update(is_active=self.is_active)
+            if self.has_accessories:
+                ItemAccessories.objects.filter(Item=self).update(is_active=self.is_active)
 
 class ItemAccessories(models.Model):
     item = models.ForeignKey(Item, limit_choices_to={'has_accessories':True}, on_delete=models.SET_NULL, blank=True, null=True)
