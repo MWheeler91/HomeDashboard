@@ -9,8 +9,14 @@ OS_CHOICES = {
     ("Linux", "Linux"),
     ("MacOS", "MacOS")
 }
-
-
+Type_CHOICES = {
+    ("server", "Server"),
+    ("pc", "PC")
+}
+key_CHOICES = {
+    ("rsa", "RSA"),
+    ("ed25519 ", "ed25519 ")
+}
 
 def upload_image(instance, filename):
     upload_to = os.path.join(settings.BASE_DIR, 'images/')
@@ -67,19 +73,35 @@ class ServerStatus(models.Model):
             self.total = None  # Or set to 0 or some default value as needed
         super().save(*args, **kwargs)
 
-class Server(models.Model):
-    name = models.CharField(max_length=50)
+class ManagedDevice(models.Model):
     hostname = models.CharField(max_length=50)
     ip_address = models.GenericIPAddressField()
     os = models.CharField(max_length=20, choices=OS_CHOICES)
-
-    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='servers_entered')
+    device_type = models.CharField(max_length=20, choices=Type_CHOICES)
+    is_active = models.BooleanField(default=True)
+    is_virtual = models.BooleanField(default=False)
+    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='device_entered')
     date_entered = models.DateField(default=datetime.now)
     last_updated_date = models.DateField(auto_now=True, blank=True, null=True)
     last_updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
-    last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='servers_updated')
+    last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='device_updated')
 
 
     def __str__(self):
-            return self.name
+        return self.hostname
     
+class SshKeys(models.Model):
+    fk_device_id = models.ForeignKey(ManagedDevice, on_delete=models.SET_NULL, blank=True, null=True)
+    name = models.CharField(max_length=50)
+    public_key = models.TextField()
+    key_type = models.CharField(choices=key_CHOICES)
+    comments = models.CharField(max_length=255, blank=True,null=True)
+    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='ssh_entered')
+    date_entered = models.DateField(default=datetime.now)
+    last_updated_date = models.DateField(auto_now=True, blank=True, null=True)
+    last_updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
+    last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='ssh_updated')
+
+
+    def __str__(self):
+        return self.name   
