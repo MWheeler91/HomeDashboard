@@ -75,7 +75,7 @@ class ServerStatus(models.Model):
 
 class ManagedDevice(models.Model):
     hostname = models.CharField(max_length=50)
-    ip_address = models.GenericIPAddressField()
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
     os = models.CharField(max_length=20, choices=OS_CHOICES)
     device_type = models.CharField(max_length=20, choices=Type_CHOICES)
     is_active = models.BooleanField(default=True)
