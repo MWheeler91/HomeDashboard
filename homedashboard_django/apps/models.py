@@ -4,11 +4,17 @@ from django.conf import settings
 from datetime import datetime
 from account.models import User
 
+OS_CHOICES = {
+    ("Windows", "Windows"),
+    ("Linux", "Linux"),
+    ("MacOS", "MacOS")
+}
+
+
 
 def upload_image(instance, filename):
     upload_to = os.path.join(settings.BASE_DIR, 'images/')
     return os.path.join(upload_to, filename)
-
 
 # Create your models here.
 class App(models.Model):
@@ -60,3 +66,20 @@ class ServerStatus(models.Model):
         else:
             self.total = None  # Or set to 0 or some default value as needed
         super().save(*args, **kwargs)
+
+class Server(models.Model):
+    name = models.CharField(max_length=50)
+    hostname = models.CharField(max_length=50)
+    ip_address = models.GenericIPAddressField()
+    os = models.CharField(max_length=20, choices=OS_CHOICES)
+
+    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='servers_entered')
+    date_entered = models.DateField(default=datetime.now)
+    last_updated_date = models.DateField(auto_now=True, blank=True, null=True)
+    last_updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
+    last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='servers_updated')
+
+
+    def __str__(self):
+            return self.name
+    
