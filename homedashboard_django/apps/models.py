@@ -80,6 +80,7 @@ class ManagedDevice(models.Model):
     device_type = models.CharField(max_length=20, choices=Type_CHOICES)
     is_active = models.BooleanField(default=True)
     is_virtual = models.BooleanField(default=False)
+    has_keys = models.BooleanField(default=False)
     entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='device_entered')
     date_entered = models.DateField(default=datetime.now)
     last_updated_date = models.DateField(auto_now=True, blank=True, null=True)
