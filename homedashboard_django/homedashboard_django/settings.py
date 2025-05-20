@@ -33,7 +33,6 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = True
 DEBUG = env('DEBUG')
 AUTH_USER_MODEL = 'account.User'
 AUTHENTICATION_BACKENDS = (
@@ -65,8 +64,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'django_json_widget',
-    #'rest_framework',
-    #'rest_framework.authtoken',
     'djoser',
     'corsheaders',
     'django_filters',
@@ -79,7 +76,8 @@ INSTALLED_APPS = [
     'catalog',
     'maintenance',
     'email_mgt',
-    'error_logging'
+    'error_logging',
+    'audiowatch'
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -123,9 +121,9 @@ WSGI_APPLICATION = 'homedashboard_django.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME_TEST'),
-        'USER': env('DB_USER_TEST'),
-        'PASSWORD': env('DB_PASSWORD_TEST'),
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
         'HOST': env('DB_HOST'),
         'PORT': env('DB_PORT'),
     },

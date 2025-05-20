@@ -11,7 +11,8 @@ OS_CHOICES = {
 }
 Type_CHOICES = {
     ("server", "Server"),
-    ("pc", "PC")
+    ("pc", "PC"),
+    ("yubikey", "YubiKey"),
 }
 key_CHOICES = {
     ("rsa", "RSA"),
