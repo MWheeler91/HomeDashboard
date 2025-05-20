@@ -4,6 +4,9 @@ venv*/
 # Django Settings / ENV
 homedashboard_django/settingsprod.py
 .env
+*.log
+*.pot
+*.pyc
 
 # Media / Static / ETC
 error_log.txt
@@ -16,3 +19,15 @@ homedashboard-django-f66383edda57.json
 
 # Linx specific
 *.swp
+
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+
+# VSCode or JetBrains IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
