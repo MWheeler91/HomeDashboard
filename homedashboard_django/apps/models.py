@@ -75,6 +75,7 @@ class ServerStatus(models.Model):
         super().save(*args, **kwargs)
 
 class ManagedDevice(models.Model):
+    fk_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,blank=True, related_name='fk_user')
     hostname = models.CharField(max_length=50)
     ip_address = models.GenericIPAddressField(blank=True, null=True)
     os = models.CharField(max_length=20, choices=OS_CHOICES)

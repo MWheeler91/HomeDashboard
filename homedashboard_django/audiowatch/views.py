@@ -4,6 +4,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 from error_logging.logger import ErrorLogger
+from classutils.discord_bot import send_discord_dm
 import traceback
 import json
 
@@ -52,10 +53,10 @@ def submit_event(request):
         )
 
         # Take action based on event type
-        # if event_type == "warning":
-        #     trigger_discord_alert(machine_id, volume)
-        # elif event_type == "cutoff":
-        #     trigger_vlan_block(machine_id)
+        if event_type == "warning":
+            trigger_discord_alert(machine_id, volume)
+        elif event_type == "cutoff":
+            trigger_vlan_block(machine_id)
 
         return JsonResponse({"status": "ok"})
 

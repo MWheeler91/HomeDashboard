@@ -7,7 +7,7 @@ from .models import User
 class AdminUser(UserAdmin):
     list_display = ('email', 'date_joined', 'last_login', 'is_admin', 'is_staff')
     search_fields = ('email',)
-    ordering = ('email',)
+    ordering = ('id','email',)
     readonly_fields = ('id', 'date_joined', 'last_login')
 
     filter_horizontal = ()
