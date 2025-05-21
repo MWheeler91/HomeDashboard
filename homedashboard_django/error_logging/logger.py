@@ -31,11 +31,10 @@ def serialize_argument(arg):
 
 class ErrorLogger:
     @staticmethod
-    def log_error(user, app, file, funct, error, stack_trace, sys_user="SYS", error_type='Exception'):
+    def log_error(user, app, file, funct, error, stack_trace, sys_user="sys", error_type='Exception'):
         try:
             frame = inspect.currentframe().f_back  # Get the caller's frame
             call_args = inspect.getargvalues(frame)  # Get arguments passed to the calling function
-            
             func_args_list = {arg: serialize_argument(call_args.locals[arg]) for arg in call_args.args}
 
             user_obj = ErrorLogger.get_user(sys_user if not user else user)
@@ -51,7 +50,7 @@ class ErrorLogger:
                         user = user_obj
                     )
                     if stack_trace is not None:
-                        ErrorLogger.log_trace(err, stack_trace, func_args_list)
+                       ErrorLogger.log_trace(err, stack_trace, func_args_list)
             except Exception as e:
                 logger.error(f"Error logging to DB failed: {e}")
                 logger.error(f"Error details: {traceback.format_exc()}")
@@ -69,7 +68,7 @@ class ErrorLogger:
     @staticmethod
     def log_trace(err, stack_trace, func_args_list):
         try:
-            trace_level = ErrorLogger.get_trace_level(stack_trace)
+            trace_level = get_trace_level(stack_trace)
             StackTrace.objects.create (
                 error_id = err,
                 stack_trace = str(stack_trace),

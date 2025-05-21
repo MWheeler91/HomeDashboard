@@ -3,6 +3,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
+from error_logging.logger import ErrorLogger
+import traceback
 import json
 
 from .models import MicMonitorConfig, MicEventLog
@@ -11,18 +13,22 @@ from apps.models import ManagedDevice
 
 @require_GET
 def get_thresholds(request, machine_id):
-    config = get_object_or_404(
-        MicMonitorConfig,
-        machine_id__hostname=machine_id,
-        is_active=True
-    )
+    try:
+        config = get_object_or_404(
+            MicMonitorConfig,
+            machine_id__hostname=machine_id,
+            is_active=True
+        )
 
-    return JsonResponse({
-        "machine_id": machine_id,
-        "warning_threshold": config.warning_threshold,
-        "cutoff_threshold": config.cutoff_threshold
-    })
-
+        return JsonResponse({
+            "machine_id": machine_id,
+            "warning_threshold": config.warning_threshold,
+            "cutoff_threshold": config.cutoff_threshold,
+            "cooldown": config.cooldown
+        })
+    except Exception as e:
+        ErrorLogger().log_error(user=None, app="audiowatch", funct="get_thresholds", file="views.py", error=str(e), stack_trace=traceback.format_exc())
+        return JsonResponse({"error": str(e)}, status=500)
 
 @csrf_exempt
 @require_POST
@@ -30,28 +36,31 @@ def submit_event(request):
     try:
         data = json.loads(request.body.decode('utf-8'))
         machine_id = data.get("machine_id")
-        volume = float(data.get("volume"))
+        device = ManagedDevice.objects.get(hostname=machine_id)
+        volume = data.get("volume")
         event_type = data.get("event_type")  # "warning" or "cutoff"
+
 
         if not machine_id or event_type not in ["warning", "cutoff"]:
             return JsonResponse({"error": "Invalid input"}, status=400)
 
         # Log event
         MicEventLog.objects.create(
-            machine_id=machine_id,
+            machine_id=device,
             volume=volume,
             event_type=event_type
         )
 
         # Take action based on event type
-        if event_type == "warning":
-            trigger_discord_alert(machine_id, volume)
-        elif event_type == "cutoff":
-            trigger_vlan_block(machine_id)
+        # if event_type == "warning":
+        #     trigger_discord_alert(machine_id, volume)
+        # elif event_type == "cutoff":
+        #     trigger_vlan_block(machine_id)
 
         return JsonResponse({"status": "ok"})
 
     except Exception as e:
+        ErrorLogger().log_error(user=None, app="audiowatch", funct="submit_event", file="views.py", error=str(e), stack_trace=traceback.format_exc())
         return JsonResponse({"error": str(e)}, status=500)
 
 

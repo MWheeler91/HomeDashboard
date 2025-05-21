@@ -46,8 +46,8 @@ class StackTrace(models.Model):
         ('ERROR', 'Error'),
         ('CRITICAL', 'Critical'),
     ]
-    
-    error_id = models.CharField(max_length=255)
+    error_fk = models.ForeignKey(Error, on_delete=models.SET_NULL, null=True, related_name='error_fk')
+    # error_id = models.CharField(max_length=255)
     stack_trace = models.TextField()
     timestamp = models.DateTimeField(default=timezone.now)
     additional_data = models.JSONField(null=True, blank=True)
@@ -58,4 +58,6 @@ class StackTrace(models.Model):
     )
 
     def __str__(self):
-        return f"{self.error_type}: {self.error} at {self.timestamp} - Level: {self.trace_level}"
+        if self.error_fk:
+            return f"Level: {self.trace_level} at {self.timestamp} in {self.error_fk.app}.{self.error_fk.funct}"
+        return f"Level: {self.trace_level} at {self.timestamp} (no error_fk)"

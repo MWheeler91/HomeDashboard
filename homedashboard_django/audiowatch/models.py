@@ -6,9 +6,10 @@ from account.models import User
 from datetime import datetime
 
 class MicMonitorConfig(models.Model):
-    machine_id = models.ForeignKey(ManagedDevice, on_delete=models.SET_NULL, null=True, limit_choices_to={'is_active': True, 'is_virtual': False}, related_name='audiowatch_entered')  # e.g. hostname or MAC
+    machine_id = models.ForeignKey(ManagedDevice, on_delete=models.SET_NULL, null=True, limit_choices_to={'is_active': True, 'is_virtual': False}, related_name='MicMonitorConfig_fk')
     warning_threshold = models.FloatField()  # e.g. -20.0 dB
     cutoff_threshold = models.FloatField()   # e.g. -10.0 dB
+    cooldown = models.IntegerField()
     is_active = models.BooleanField(default=True)
     
 
@@ -23,7 +24,7 @@ class MicMonitorConfig(models.Model):
 
 
 class MicEventLog(models.Model):
-    machine_id = models.CharField(max_length=100)
+    machine_id = models.ForeignKey(ManagedDevice, on_delete=models.CASCADE,limit_choices_to={'is_active': True, 'is_virtual': False}, related_name='MicEventLog_fk')
     volume = models.FloatField()
     event_type = models.CharField(max_length=10)  # "warning" or "cutoff"
     timestamp = models.DateTimeField(auto_now_add=True)

@@ -4,20 +4,20 @@ from django.conf import settings
 from datetime import datetime
 from account.models import User
 
-OS_CHOICES = {
+OS_CHOICES = [
     ("Windows", "Windows"),
     ("Linux", "Linux"),
     ("MacOS", "MacOS")
-}
-Type_CHOICES = {
+]
+Type_CHOICES = [
     ("server", "Server"),
     ("pc", "PC"),
     ("yubikey", "YubiKey"),
-}
-key_CHOICES = {
+]
+key_CHOICES = [
     ("rsa", "RSA"),
     ("ed25519 ", "ed25519 ")
-}
+]
 
 def upload_image(instance, filename):
     upload_to = os.path.join(settings.BASE_DIR, 'images/')
