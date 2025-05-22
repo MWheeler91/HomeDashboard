@@ -7,7 +7,8 @@ from error_logging.logger import ErrorLogger
 from classutils.discord_bot import send_discord_dm
 import environ
 import json
-
+from django.utils import timezone
+from datetime import date
 from .models import MicMonitorConfig, MicEventLog
 from apps.models import ManagedDevice
 from account.models import User
@@ -64,14 +65,29 @@ def submit_event(request):
 
 def trigger_discord_alert(device, volume, event_type):
     try:
-        print(device.fk_user_id)
+        today = date.today()
         user = User.objects.get(id=device.fk_user_id.id)
-        print(user)
+        count = MicEventLog.objects.filter(
+                    fk_machine_id=device,
+                    event_type=event_type,
+                    timestamp__date=today
+                ).count()
+        
         send_discord_dm(
             bot_token=env('AUDIOWATCH_API_TOKEN'),
             user_id=user.discord_user_id,
-            message=f" Warning: Your mic volume hit {volume:.2f} dB. Please quiet down."
+            message=f" Warning: Your mic volume hit {volume:.2f} dB. Please quiet down.  You've had {count} {event_type.lower()} occurences today."
         )
+
+        if user.id != 1:
+            admin_user = User.objects.get(id=1)
+            print(admin_user)
+            send_discord_dm(
+                bot_token=env('AUDIOWATCH_API_TOKEN'),
+                user_id=admin_user.discord_user_id,
+                message=f" {user.first_name} mic volume hit {volume:.2f} dB. This is their {count} {event_type.lower()} occurence today."
+            )
+
     except Exception as e:
         ErrorLogger.log(e, app="audiowatch", user=None)
 
