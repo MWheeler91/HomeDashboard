@@ -31,7 +31,7 @@ class DKIM_Record(models.Model):
     class Meta:
         db_table = "email_dkim_record"
 
-    dkim_id = models.ForeignKey(DKIM, on_delete=models.SET_NULL, null=True, related_name='dkim_record')    
+    fk_dkim_id = models.ForeignKey(DKIM, on_delete=models.SET_NULL, null=True, related_name='dkim_record')    
     source_ip = models.GenericIPAddressField(blank=True, null=True)
     record_type = models.CharField(max_length=10, blank=True, null=True)
     domain = models.TextField(max_length=100, blank=True, null=True)
@@ -45,4 +45,4 @@ class DKIM_Record(models.Model):
     last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='dkim_record_updated')
 
     def __str__(self):
-        return f"{self.dkim_id} - {self.domain} - {self.record_type}: {self.result}"
+        return f"{self.fk_dkim_id} - {self.domain} - {self.record_type}: {self.result}"

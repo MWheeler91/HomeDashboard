@@ -5,19 +5,21 @@ from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 from error_logging.logger import ErrorLogger
 from classutils.discord_bot import send_discord_dm
-import traceback
+import environ
 import json
 
 from .models import MicMonitorConfig, MicEventLog
 from apps.models import ManagedDevice
+from account.models import User
 
+env = environ.Env()
 
 @require_GET
 def get_thresholds(request, machine_id):
     try:
         config = get_object_or_404(
             MicMonitorConfig,
-            machine_id__hostname=machine_id,
+            fk_machine_id__hostname=machine_id,
             is_active=True
         )
 
@@ -28,7 +30,8 @@ def get_thresholds(request, machine_id):
             "cooldown": config.cooldown
         })
     except Exception as e:
-        ErrorLogger().log_error(user=None, app="audiowatch", funct="get_thresholds", file="views.py", error=str(e), stack_trace=traceback.format_exc())
+        ErrorLogger.log(e, app="audiowatch", user=None)
+        # ErrorLogger().log_error(user=None, app="audiowatch", funct="get_thresholds", file="views.py", error=str(e), stack_trace=traceback.format_exc())
         return JsonResponse({"error": str(e)}, status=500)
 
 @csrf_exempt
@@ -41,34 +44,36 @@ def submit_event(request):
         volume = data.get("volume")
         event_type = data.get("event_type")  # "warning" or "cutoff"
 
-
+        print(device)
         if not machine_id or event_type not in ["warning", "cutoff"]:
             return JsonResponse({"error": "Invalid input"}, status=400)
 
         # Log event
         MicEventLog.objects.create(
-            machine_id=device,
+            fk_machine_id=device,
             volume=volume,
             event_type=event_type
         )
-
-        # Take action based on event type
-        if event_type == "warning":
-            trigger_discord_alert(machine_id, volume)
-        elif event_type == "cutoff":
-            trigger_vlan_block(machine_id)
+        trigger_discord_alert(device, volume, event_type)
 
         return JsonResponse({"status": "ok"})
 
     except Exception as e:
-        ErrorLogger().log_error(user=None, app="audiowatch", funct="submit_event", file="views.py", error=str(e), stack_trace=traceback.format_exc())
+        ErrorLogger.log(e, app="audiowatch", user=None)
         return JsonResponse({"error": str(e)}, status=500)
 
-
-# === Stub Functions ===
-def trigger_discord_alert(machine_id, volume):
-    # Add Discord webhook logic here
-    print(f"[DISCORD] {machine_id} yelled at {volume:.2f} dB")
+def trigger_discord_alert(device, volume, event_type):
+    try:
+        print(device.fk_user_id)
+        user = User.objects.get(id=device.fk_user_id.id)
+        print(user)
+        send_discord_dm(
+            bot_token=env('AUDIOWATCH_API_TOKEN'),
+            user_id=user.discord_user_id,
+            message=f" Warning: Your mic volume hit {volume:.2f} dB. Please quiet down."
+        )
+    except Exception as e:
+        ErrorLogger.log(e, app="audiowatch", user=None)
 
 
 def trigger_vlan_block(machine_id):

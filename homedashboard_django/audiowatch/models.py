@@ -6,7 +6,7 @@ from account.models import User
 from datetime import datetime
 
 class MicMonitorConfig(models.Model):
-    machine_id = models.ForeignKey(ManagedDevice, on_delete=models.SET_NULL, null=True, limit_choices_to={'is_active': True, 'is_virtual': False}, related_name='MicMonitorConfig_fk')
+    fk_machine_id = models.ForeignKey(ManagedDevice, on_delete=models.SET_NULL, null=True, limit_choices_to={'is_active': True, 'is_virtual': False}, related_name='MicMonitorConfig_fk')
     warning_threshold = models.FloatField()  # e.g. -20.0 dB
     cutoff_threshold = models.FloatField()   # e.g. -10.0 dB
     cooldown = models.IntegerField()
@@ -20,11 +20,11 @@ class MicMonitorConfig(models.Model):
     last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='MicMonitorConfig_updated')
 
     def __str__(self):
-        return f"{self.machine_id} config"
+        return f"{self.fk_machine_id} config"
 
 
 class MicEventLog(models.Model):
-    machine_id = models.ForeignKey(ManagedDevice, on_delete=models.CASCADE,limit_choices_to={'is_active': True, 'is_virtual': False}, related_name='MicEventLog_fk')
+    fk_machine_id = models.ForeignKey(ManagedDevice, on_delete=models.CASCADE,limit_choices_to={'is_active': True, 'is_virtual': False}, related_name='MicEventLog_fk')
     volume = models.FloatField()
     event_type = models.CharField(max_length=10)  # "warning" or "cutoff"
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -36,4 +36,4 @@ class MicEventLog(models.Model):
     last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='MicEventLog_updated')
 
     def __str__(self):
-        return f"{self.machine_id} - {self.event_type} - {self.volume:.2f} dB"
+        return f"{self.fk_machine_id} - {self.event_type} - {self.volume:.2f} dB"

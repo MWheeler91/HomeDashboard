@@ -1,5 +1,6 @@
 import discord
 import asyncio
+from error_logging.logger import ErrorLogger
 
 class DiscordBotSender(discord.Client):
     def __init__(self, token, user_id, message):
@@ -15,8 +16,13 @@ class DiscordBotSender(discord.Client):
             print(f"Message sent to {user}")
         except Exception as e:
             print(f"Failed to send message: {e}")
-        await self.close()
+        finally:
+            await self.close()
 
 def send_discord_dm(bot_token, user_id, message):
-    client = DiscordBotSender(bot_token, user_id, message)
-    asyncio.run(client.start(bot_token))
+    try:
+        client = DiscordBotSender(bot_token, user_id, message)
+        client.run(bot_token)
+        # asyncio.run(client.start(bot_token))
+    except Exception as e:
+        ErrorLogger.log(e, app="audiowatch", user=None)

@@ -14,7 +14,6 @@ class Category(models.Model):
     def __str__(self):
         return "{}".format(self.item_category)
 
-
 class Room(models.Model):
     room = models.CharField(max_length=200, unique=True)
 
@@ -31,9 +30,9 @@ class Condition(models.Model):
 class Item(models.Model):
     item_name = models.CharField(max_length=200)
     item_description = models.CharField(max_length=200, blank=True, null=True)
-    item_category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
-    condition = models.ForeignKey(Condition, on_delete=models.SET_NULL, blank=True, null=True)
-    room = models.ForeignKey(Room, on_delete=models.SET_NULL, blank=True, null=True)
+    fk_category_id = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
+    fk_condition_id = models.ForeignKey(Condition, on_delete=models.SET_NULL, blank=True, null=True)
+    fk_room_id = models.ForeignKey(Room, on_delete=models.SET_NULL, blank=True, null=True)
     purchase_price = models.DecimalField(max_digits=100, decimal_places=2, blank=True, null=True)
     purchase_date = models.DateField(blank=True, null=True)
     value_now = models.DecimalField(max_digits=100, decimal_places=2, blank=True, null=True)
@@ -53,7 +52,7 @@ class Item(models.Model):
         ordering = ['id']
 
     def __str__(self):
-        match self.item_category.item_category if self.item_category else None:
+        match self.fk_category_id.item_category if self.fk_category_id else None:
             case 'Server':
                 return f"{self.id}: {self.item_name} - {self.asset_tag}"
             case _:
@@ -77,7 +76,7 @@ class Item(models.Model):
         
 
 class ItemAccessories(models.Model):
-    item = models.ForeignKey(Item, limit_choices_to={'has_accessories':True}, on_delete=models.SET_NULL, blank=True, null=True)
+    fk_item_id = models.ForeignKey(Item, limit_choices_to={'has_accessories':True}, on_delete=models.SET_NULL, blank=True, null=True)
     name = models.CharField(max_length=200)
     purchase_price = models.DecimalField(max_digits=100, decimal_places=2, blank=True, null=True)
     purchase_date = models.DateField(blank=True, null=True)

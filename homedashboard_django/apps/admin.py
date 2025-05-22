@@ -8,8 +8,8 @@ admin.site.register(ServerStatus)
 
 class ManagedDeviceAdmin(BaseModelAdmin):
     def save_model(self, request, obj, form, change):
-        if not obj.user_fk:
-            obj.user_fk = request.user
+        if not obj.fk_user_id:
+            obj.fk_user_id = request.user
         super().save_model(request, obj, form, change)
 
 class SshKeysAdmin(BaseModelAdmin):

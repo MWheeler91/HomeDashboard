@@ -31,6 +31,41 @@ def serialize_argument(arg):
 
 class ErrorLogger:
     @staticmethod
+    def log(exception, app, user=None, error_type='Exception', sys_user="sys"):
+        try:
+            print(exception)
+            frame = inspect.currentframe().f_back
+            file = os.path.basename(frame.f_code.co_filename)
+            funct = frame.f_code.co_name
+            stack_trace = traceback.format_exc()
+
+            func_args = inspect.getargvalues(frame)
+            func_args_list = {arg: serialize_argument(func_args.locals[arg]) for arg in func_args.args}
+
+            user_obj = ErrorLogger.get_user(sys_user if not user else user)
+            
+            try:
+                with transaction.atomic():
+                    err = Error.objects.create(
+                        app=app,
+                        funct=funct,
+                        file=file,
+                        error=str(exception),
+                        error_type=error_type,
+                        fk_user_id=user_obj
+                    )
+                    ErrorLogger.log_trace(err, stack_trace, func_args_list)
+
+            except Exception as db_error:
+                logger.error(f"[Error logging to DB failed] {db_error}")
+                ErrorLogger.write_to_file(user, app, file, funct, str(exception), error_type)
+                ErrorLogger.write_to_file(user, app, file, funct, str(db_error), 'DB_Error')
+
+        except Exception as fail:
+            logger.error(f"[ErrorLogger internal failure] {fail}")
+            ErrorLogger.write_to_file(user, app, "logger.py", "log", str(fail), 'LoggerFail')
+
+    @staticmethod
     def log_error(user, app, file, funct, error, stack_trace, sys_user="sys", error_type='Exception'):
         try:
             frame = inspect.currentframe().f_back  # Get the caller's frame
@@ -56,13 +91,10 @@ class ErrorLogger:
                 logger.error(f"Error details: {traceback.format_exc()}")
 
         except (IntegrityError, OperationalError) as db_error:
-            # logger.error(f"Database error while logging error: {db_error}")
             ErrorLogger.write_to_file(user, app, file, funct, error, error_type)
             ErrorLogger.write_to_file(user, app, file, funct, str(db_error), 'DB_Error')
 
         except Exception as e:
-            # logger.error(f"Unexpected error during logging: {e}")
-            # logger.error(f"Error details: {traceback.format_exc()}")
             ErrorLogger.write_to_file(user, app, file, funct, error, error_type)
 
     @staticmethod
@@ -76,11 +108,8 @@ class ErrorLogger:
                 trace_level = trace_level
             )
         except (IntegrityError, OperationalError) as db_error:
-            # logger.error(f"Database error while logging error: {db_error}")
             ErrorLogger.write_to_file('SYS', 'Error_mgt', 'logger.py', 'log_trace', str(db_error), 'DB_Error')
         except Exception as e:
-            # logger.error(f"Unexpected error during logging: {e}")
-            # logger.error(f"Error details: {traceback.format_exc()}")
             ErrorLogger.write_to_file('SYS', 'Error_mgt', 'logger.py', 'log_trace', str(e), 'Exception')
 
     @staticmethod
@@ -88,13 +117,13 @@ class ErrorLogger:
         try:
             return User.objects.get(username=user)
         except User.DoesNotExist as e:
-            ErrorLogger.log_error(user, 'Error Logging', 'get_user', 'logger.py', e, 'User Does Not Exist')
-            return User.objects.get(username="SYS")
+            ErrorLogger.log(e, app="error", user=None)
+            return User.objects.get(username="sys")
         except Exception as e:
             # Catch any other errors and log them to file
             logger.error(f"{user},error_logging,logger.py,get_user,{e},Exception")
             logger.error(f"get_user error: {traceback.format_exc()}")
-            ErrorLogger.log_error(user, 'Error Logging', 'get_user', 'logger.py', e)
+            ErrorLogger.log(e, app="error", user=None)
             return None  # Avoid breaking main execution
 
     @staticmethod

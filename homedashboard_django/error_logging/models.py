@@ -14,7 +14,7 @@ class Error(models.Model):
     file = models.TextField(max_length=50)
     error_type = models.TextField()
     error = models.TextField()
-    user =  models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,related_name='error_user')
+    fk_user_id =  models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,related_name='error_user')
     # additonal field when inserting errors from the error log when there is a DB cannt be reached
     error_time = models.DateTimeField(default=timezone.now)
 
@@ -46,7 +46,7 @@ class StackTrace(models.Model):
         ('ERROR', 'Error'),
         ('CRITICAL', 'Critical'),
     ]
-    error_fk = models.ForeignKey(Error, on_delete=models.SET_NULL, null=True, related_name='error_fk')
+    fk_error_id = models.ForeignKey(Error, on_delete=models.SET_NULL, null=True, related_name='error_fk')
     # error_id = models.CharField(max_length=255)
     stack_trace = models.TextField()
     timestamp = models.DateTimeField(default=timezone.now)
@@ -58,6 +58,6 @@ class StackTrace(models.Model):
     )
 
     def __str__(self):
-        if self.error_fk:
-            return f"Level: {self.trace_level} at {self.timestamp} in {self.error_fk.app}.{self.error_fk.funct}"
+        if self.fk_error_id:
+            return f"Level: {self.trace_level} at {self.timestamp} in {self.fk_error_id.app}.{self.fk_error_id.funct}"
         return f"Level: {self.trace_level} at {self.timestamp} (no error_fk)"

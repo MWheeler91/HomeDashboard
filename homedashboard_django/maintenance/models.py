@@ -45,9 +45,9 @@ class Vehicle(models.Model):
 
 
 class Maintenance(models.Model):
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
+    fk_vehicle_id = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
     mileage = models.IntegerField()
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    fk_category_id = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     short_description = models.CharField(max_length=50, default="")
     maintenance_performed = models.TextField()
     cost = models.DecimalField(max_digits=100, decimal_places=2)
@@ -63,7 +63,7 @@ class Maintenance(models.Model):
     # part details ( part used / part number )
 
     def __str__(self):
-        return f"{self.date_performed.strftime('%m/%d/%Y')} - {self.vehicle} - {self.category} - {self.short_description}"
+        return f"{self.date_performed.strftime('%m/%d/%Y')} - {self.fk_vehicle_id} - {self.fk_category_id} - {self.short_description}"
     
     class Meta:
         verbose_name = "Maintenance"
@@ -71,7 +71,7 @@ class Maintenance(models.Model):
 
 
 class MaintenanceFile(models.Model):
-    maintenance = models.ForeignKey(Maintenance, on_delete=models.SET_NULL, null=True)
+    fk_maintenance_id = models.ForeignKey(Maintenance, on_delete=models.SET_NULL, null=True)
     date_entered = models.DateField(default=datetime.now)
     updated_date = models.DateField(auto_now=True, blank=True, null=True)
     updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
@@ -88,7 +88,7 @@ class MaintenanceFile(models.Model):
 
 
 class Accessory(models.Model):
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
+    fk_vehicle_id = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
     brand = models.CharField(max_length=50, blank=True, null=True)
     short_description = models.CharField(max_length=50)
     description = models.CharField(max_length=50, blank=True, null=True)
@@ -103,7 +103,7 @@ class Accessory(models.Model):
     last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return f"{self.vehicle} - {self.short_description}"
+        return f"{self.fk_vehicle_id} - {self.short_description}"
     
     class Meta:
         verbose_name = "Accessory"
@@ -111,8 +111,8 @@ class Accessory(models.Model):
 
 
 class AccessoriesFile(models.Model):
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
-    accessory = models.ForeignKey(Accessory, on_delete=models.SET_NULL, null=True)
+    fk_vehicle_id = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
+    fk_accessory_id = models.ForeignKey(Accessory, on_delete=models.SET_NULL, null=True)
     files = models.FileField(upload_to="uploads/accessories/", blank=True, null=True)
     date_entered = models.DateField(default=datetime.now)
     updated_date = models.DateField(auto_now=True, blank=True, null=True)
@@ -127,7 +127,7 @@ class AccessoriesFile(models.Model):
     
 
 class VehicleRegistration(models.Model):
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
+    fk_vehicle_id = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
     registration_expiration_date = models.DateField(blank=True, null=True)
     date_paid = models.DateField(blank=True, null=True)
     active_year = models.BooleanField()

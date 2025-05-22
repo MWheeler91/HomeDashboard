@@ -42,7 +42,7 @@ class App(models.Model):
 
 
 class ServerStatus(models.Model):
-    app = models.ForeignKey(App, on_delete=models.SET_NULL, blank=True, null=True)
+    fk_app_id = models.ForeignKey(App, on_delete=models.SET_NULL, blank=True, null=True)
     ip_address = models.CharField(max_length=15, blank=True, null=True)
     host_name = models.CharField(max_length=50, blank=True, null=True)
 
@@ -75,7 +75,7 @@ class ServerStatus(models.Model):
         super().save(*args, **kwargs)
 
 class ManagedDevice(models.Model):
-    fk_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,blank=True, related_name='fk_user')
+    fk_user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,blank=True, related_name='fk_user')
     hostname = models.CharField(max_length=50)
     ip_address = models.GenericIPAddressField(blank=True, null=True)
     os = models.CharField(max_length=20, choices=OS_CHOICES)
@@ -105,6 +105,5 @@ class SshKeys(models.Model):
     last_updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
     last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='ssh_updated')
 
-
     def __str__(self):
-        return self.name   
+        return self.name 
