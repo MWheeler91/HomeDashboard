@@ -1,8 +1,6 @@
 from django.db import models
 from datetime import datetime
 from account.models import User
-from error_logging.logger import ErrorLogger
-import traceback
 # Create your models here
 
 def get_json():
@@ -66,11 +64,8 @@ class Item(models.Model):
             old_instance = type(self).objects.get(pk=self.pk)
             if old_instance.is_active != self.is_active and self.has_accessories:
                 # Update related accessories only if is_active changed
-                try:
-                    ItemAccessories.objects.filter(item=self).update(is_active=self.is_active)
-                except Exception as e:
-                    print(e)
-                    ErrorLogger().log_error(user="SYS", app="catalog", funct="Item.save", file="models.py", error=str(e), stack_trace=traceback.format_exc())
+                ItemAccessories.objects.filter(item=self).update(is_active=self.is_active)
+
 
         super().save(*args, **kwargs)  # Save after checking conditions
         

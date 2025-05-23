@@ -1,12 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 # from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
-from django.forms import Form, ModelForm, DateField, widgets, ChoiceField
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, Div, HTML, Row, Column
 from .models import User
-
+from classutils.common import catch_errors
 
 class CreateUserForm(UserCreationForm):
 
@@ -16,6 +12,7 @@ class CreateUserForm(UserCreationForm):
         model = User
         fields = ['email', 'confirm_email', 'password1', 'password2', 'first_name', 'last_name']
 
+    catch_errors("account")
     def clean(self):
         super(CreateUserForm, self).clean()
         email = self.cleaned_data.get('email')

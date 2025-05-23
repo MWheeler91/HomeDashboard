@@ -1,5 +1,5 @@
 import discord
-import asyncio
+from classutils.common import catch_errors
 from error_logging.logger import ErrorLogger
 
 class DiscordBotSender(discord.Client):
@@ -9,6 +9,7 @@ class DiscordBotSender(discord.Client):
         self.user_id = user_id
         self.message = message
 
+    @catch_errors('discord')
     async def on_ready(self):
         try:
             user = await self.fetch_user(self.user_id)
@@ -19,10 +20,7 @@ class DiscordBotSender(discord.Client):
         finally:
             await self.close()
 
+@catch_errors('discord')
 def send_discord_dm(bot_token, user_id, message):
-    try:
-        client = DiscordBotSender(bot_token, user_id, message)
-        client.run(bot_token)
-        # asyncio.run(client.start(bot_token))
-    except Exception as e:
-        ErrorLogger.log(e, app="audiowatch", user=None)
+    client = DiscordBotSender(bot_token, user_id, message)
+    client.run(bot_token)

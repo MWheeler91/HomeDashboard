@@ -3,7 +3,7 @@ from .models import MicMonitorConfig, MicEventLog
 from classutils.admin import BaseModelAdmin
 
 # Register your models here.
-class MicMonitorConfigAdmin(admin.ModelAdmin):
+class MicMonitorConfigAdmin(BaseModelAdmin):
     pass
 
 class MicEventLogAdmin(BaseModelAdmin):

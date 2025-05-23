@@ -1,12 +1,13 @@
 from django.contrib import admin
 from .models import App, ServerStatus,ManagedDevice,SshKeys
 from classutils.admin import BaseModelAdmin
-
+from classutils.common import catch_admin_errors
 
 admin.site.register(App)
 admin.site.register(ServerStatus)
 
 class ManagedDeviceAdmin(BaseModelAdmin):
+    catch_admin_errors("apps")
     def save_model(self, request, obj, form, change):
         if not obj.fk_user_id:
             obj.fk_user_id = request.user

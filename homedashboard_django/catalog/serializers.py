@@ -67,5 +67,4 @@ class GetAllItemSerializer(serializers.ModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         queryset = queryset.select_related('item_category', 'condition', 'room', 'entered_by')
-        print(queryset)
         return queryset

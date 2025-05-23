@@ -4,24 +4,18 @@ from rest_framework.response import Response
 from django.db.models import Prefetch
 from .serializers import *
 from .models import *
-
+from classutils.common import catch_api_errors
 
 # Create your views here.
 class GetVehicles(APIView):
+    @catch_api_errors('Maintenance')
     def get(self, request):
         vehicles = Vehicle.objects.all()
-
         vehicle_serializer = VehicleSerializer(vehicles, many=True)
-
-        # vehicle_list = [item["vehicle"] for item in vehicle_serializer.data]
-
-        # data = {
-        #     "vehicle": vehicle_list
-        # }
-
         return Response(vehicle_serializer.data)
 
 class GetValues(APIView):
+    @catch_api_errors('Maintenance')
     def get(self, request):
         vehicles = Vehicle.objects.all()
         categories = Category.objects.all()
@@ -32,7 +26,6 @@ class GetValues(APIView):
         vehicle_list = [item["vehicle_string"] for item in vehicle_string_serializer.data]
         category_list = [item["category"] for item in category_serializer.data]
 
-
         data = {
             "vehicle": vehicle_list,
             "category": category_list
@@ -41,6 +34,7 @@ class GetValues(APIView):
         return Response(data)
 
 class GetMaintenanceList(APIView):
+    @catch_api_errors('Maintenance')
     def get(self, request):
         # To reduce the number of database queries to get the string values this will call the setup_eager_loading function
         # in the serializer to pre petch all the related names.
@@ -52,17 +46,11 @@ class GetMaintenanceList(APIView):
         serializer = MaintenanceSerializer(maintenance_list, many=True)
         return Response(serializer.data)
 
-
 class DeleteMaintenance(APIView):
+    @catch_api_errors('Maintenance')
     def delete(self, request, id):
-        try:
-            # Get the item by ID
-            maint_to_be_delete = Maintenance.objects.get(pk=id)
-        except maint_to_be_delete.DoesNotExist:
-            return Response(
-                {"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND
-            )
-
+        # Get the item by ID
+        maint_to_be_delete = Maintenance.objects.get(pk=id)
         # Delete the item
         maint_to_be_delete.delete()
 
@@ -70,22 +58,17 @@ class DeleteMaintenance(APIView):
             {"message": "Item deleted successfully"}, status=status.HTTP_200_OK
         )
 
+    
+
 class NewMaintenance(APIView):
+    @catch_api_errors('Maintenance')
     def post(self, request):
-        print(request.data)
-        try:
-            the_vehicle = request.data["vehicle"].split()
-
-            vehicle_id = Vehicle.objects.get(
-                year=int(the_vehicle[0]),
-                make=the_vehicle[1],
-                model=the_vehicle[2]
-                )
-        except Vehicle.DoesNotExist:
-            raise NotFound("Vehicle not found.")
-        except ValueError:
-            raise NotFound("Invalid vehicle year format.")            
-
+        the_vehicle = request.data["vehicle"].split()
+        vehicle_id = Vehicle.objects.get(
+            year=int(the_vehicle[0]),
+            make=the_vehicle[1],
+            model=the_vehicle[2]
+            )           
 
         category_id = Category.objects.get(category=request.data["category"])
 

@@ -3,14 +3,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from django.db.models import Prefetch
 from .serializers import *
-from django.http import Http404
-import time
-
-
+from classutils.common import catch_api_errors
 # Create your views here.
 
 
 class GetValues(APIView):
+    @catch_api_errors('catalog')
     def get(self, request):
         rooms = Room.objects.all()
         condition = Condition.objects.all()
@@ -34,8 +32,8 @@ class GetValues(APIView):
 
 
 class NewItem(APIView):
+    @catch_api_errors('catalog')
     def post(self, request):
-        print(request.data)
         room_id = Room.objects.get(room=request.data["room"])
         item_category_id = Category.objects.get(
             item_category=request.data["item_category"]
@@ -56,21 +54,12 @@ class NewItem(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+  
 
 class DeleteItem(APIView):
+    @catch_api_errors('catalog')
     def delete(self, request, id):
-        print(request.data)
-        print(request.data)
-        try:
-            # Get the item by ID
-            item = Item.objects.get(pk=id)
-        except Item.DoesNotExist:
-            return Response(
-                {"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND
-            )
-
-        # Delete the item
+        item = Item.objects.get(pk=id)
         item.delete()
 
         return Response(
@@ -78,38 +67,34 @@ class DeleteItem(APIView):
         )
 
 
+
 class UpdateItem(APIView):
+    @catch_api_errors('catalog')
     def put(self, request, id):
-        print(request.data)
+        room_id = Room.objects.get(room=request.data["room"])
+        item_category_id = Category.objects.get(
+            item_category=request.data["item_category"]
+        )
+        condition_id = Condition.objects.get(condition=request.data["condition"])
 
-        try:
-            room_id = Room.objects.get(room=request.data["room"])
-            item_category_id = Category.objects.get(
-                item_category=request.data["item_category"]
-            )
-            condition_id = Condition.objects.get(condition=request.data["condition"])
+        item = Item.objects.get(id=request.data["id"])
+        item.item_name = request.data["item_name"]
+        item.item_description = request.data["item_description"]
+        item.item_category = item_category_id
+        item.condition = condition_id
+        item.room = room_id
+        item.serial_number = request.data['serial_number']
+        item.model_number = request.data['model_number']
+        item.value = request.data["value"]
+        item.save()
+        return Response(
+            {"message": "Item updated successfully"}, status=status.HTTP_200_OK
+        )
 
-            item = Item.objects.get(id=request.data["id"])
-            item.item_name = request.data["item_name"]
-            item.item_description = request.data["item_description"]
-            item.item_category = item_category_id
-            item.condition = condition_id
-            item.room = room_id
-            item.serial_number = request.data['serial_number']
-            item.model_number = request.data['model_number']
-            item.value = request.data["value"]
-            item.save()
-            return Response(
-                {"message": "Item updated successfully"}, status=status.HTTP_200_OK
-            )
-
-        except Item.DoesNotExist:
-            return Response(
-                {"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND
-            )
 
 
 class GetAllItems(APIView):
+    catch_api_errors('catalog')
     def get(self, request):
         # To reduce the number of database queries to get the string values this will call the setup_eager_loading function
         # in the serializer to pre petch all the related names.
@@ -122,3 +107,4 @@ class GetAllItems(APIView):
             ))
         serializer = GetAllItemSerializer(items, many=True)
         return Response(serializer.data)
+

@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
-
+from classutils.common import catch_errors
 
 class CaseInsensitiveModelBackend(ModelBackend):
+    @catch_errors("account")
     def authenticate(self, request, username=None, password=None, **kwargs):
         UserModel = get_user_model()
         if username is None:
