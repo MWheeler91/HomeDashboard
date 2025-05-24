@@ -1,6 +1,5 @@
-import discord
+import discord, requests
 from classutils.common import catch_errors
-from error_logging.logger import ErrorLogger
 
 class DiscordBotSender(discord.Client):
     def __init__(self, token, user_id, message):
@@ -22,5 +21,21 @@ class DiscordBotSender(discord.Client):
 
 @catch_errors('discord')
 def send_discord_dm(bot_token, user_id, message):
-    client = DiscordBotSender(bot_token, user_id, message)
-    client.run(bot_token)
+    try:
+        url = "http://127.0.0.1:8000/send_dm/"
+        payload = {
+            "bot_token": bot_token,
+            "user_id": user_id,
+            "message": message
+        }
+
+        response = requests.post(url, json=payload, timeout=5)
+        response.raise_for_status()
+        return response.json()  # Should return {"status": "success", ...}
+    except requests.exceptions.RequestException as e:
+        client = DiscordBotSender(bot_token, user_id, message)
+        client.run(bot_token)
+        # return {"status": "error", "detail": str(e)}
+
+
+    

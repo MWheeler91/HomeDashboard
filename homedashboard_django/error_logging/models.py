@@ -32,7 +32,7 @@ class Error(models.Model):
         super(Error, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.app} - {self.funct} - {self.file} - {self.date_entered}"
+        return f"{self.app} - {self.funct} - {self.file} - {self.error_time}"
 
 
 class StackTrace(models.Model):

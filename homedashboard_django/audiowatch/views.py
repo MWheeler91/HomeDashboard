@@ -13,8 +13,9 @@ import environ, json
 env = environ.Env()
 
 @require_GET
-@catch_api_errors('audiowatch')
+# @catch_api_errors('audiowatch')
 def get_thresholds(request, machine_id):
+    print(f"Fetching config for machine_id: {machine_id}")
     config = get_object_or_404(
         MicMonitorConfig,
         fk_machine_id__hostname=machine_id,

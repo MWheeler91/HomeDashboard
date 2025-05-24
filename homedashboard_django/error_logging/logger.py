@@ -34,33 +34,48 @@ class ErrorLogger:
     def log(exception, app, user=None, error_type='Exception', sys_user="sys"):
         try:
             print(exception)
-            frame = inspect.currentframe().f_back
-            file = os.path.basename(frame.f_code.co_filename)
-            funct = frame.f_code.co_name
             stack_trace = traceback.format_exc()
+            tb = traceback.extract_tb(exception.__traceback__)
 
-            func_args = inspect.getargvalues(frame)
+            # Walk the traceback in reverse and find the first non-decorator frame
+            relevant_frame = None
+            for frame in reversed(tb):
+                if not frame.filename.endswith("decorators.py"):
+                    relevant_frame = frame
+                    break
+
+            if relevant_frame:
+                file = os.path.basename(relevant_frame.filename)
+                funct = relevant_frame.name
+            else:
+                # fallback if everything is in decorators.py
+                frame = inspect.currentframe().f_back
+                file = os.path.basename(frame.f_code.co_filename)
+                funct = frame.f_code.co_name
+
+            # Get the frame of the actual exception to extract args (optional, best-effort)
+            frame_obj = traceback.walk_tb(exception.__traceback__).__next__()[0]
+            func_args = inspect.getargvalues(frame_obj)
             func_args_list = {arg: serialize_argument(func_args.locals[arg]) for arg in func_args.args}
 
             user_obj = ErrorLogger.get_user(sys_user if not user else user)
-            
-            try:
-                with transaction.atomic():
-                    err = Error.objects.create(
-                        app=app,
-                        funct=funct,
-                        file=file,
-                        error=str(exception),
-                        error_type=error_type,
-                        fk_user_id=user_obj
-                    )
-                    ErrorLogger.log_trace(err, stack_trace, func_args_list)
 
-            except Exception as db_error:
-                logger.error(f"[Error logging to DB failed] {db_error}")
-                ErrorLogger.write_to_file(user, app, file, funct, str(exception), error_type)
-                ErrorLogger.write_to_file(user, app, file, funct, str(db_error), 'DB_Error')
-
+            with transaction.atomic():
+                err = Error.objects.create(
+                    app=app,
+                    funct=funct,
+                    file=file,
+                    error=str(exception),
+                    error_type=error_type,
+                    fk_user_id=user_obj
+                )
+                ErrorLogger.log_trace(err, stack_trace, func_args_list)
+        except Exception as log_ex:
+            print("Failed to log error:", log_ex)
+        except Exception as db_error:
+            logger.error(f"[Error logging to DB failed] {db_error}")
+            ErrorLogger.write_to_file(user, app, file, funct, str(exception), error_type)
+            ErrorLogger.write_to_file(user, app, file, funct, str(db_error), 'DB_Error')
         except Exception as fail:
             logger.error(f"[ErrorLogger internal failure] {fail}")
             ErrorLogger.write_to_file(user, app, "logger.py", "log", str(fail), 'LoggerFail')

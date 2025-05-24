@@ -1,23 +1,35 @@
 from functools import wraps
 from rest_framework.response import Response
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import JsonResponse
 # from .models import ErrorLogger
 from error_logging.logger import ErrorLogger
 
 def catch_api_errors(app_name):
     def decorator(func):
         @wraps(func)
-        def wrapper(self, request, *args, **kwargs):
+        def wrapper(*args, **kwargs):
+            request = None
+            # Try to extract request (function-based vs class-based)
+            if args:
+                if hasattr(args[0], 'META'):
+                    request = args[0]  # function-based view
+                elif len(args) > 1 and hasattr(args[1], 'META'):
+                    request = args[1]  # class-based view: self, request
             try:
-                return func(self, request, *args, **kwargs)
+                return func(*args, **kwargs)
             except ObjectDoesNotExist as e:
-                ErrorLogger.log(e, app=app_name, user=request.user if request.user.is_authenticated else None)
-                return Response({"error": "Not found"}, status=404)
+                if request:
+                      # or your actual import
+                    ErrorLogger.log(e, app=app_name, user=request.user if getattr(request, 'user', None) and request.user.is_authenticated else None)
+                return JsonResponse({"error": "Not found"}, status=404)
             except Exception as e:
-                ErrorLogger.log(e, app=app_name, user=request.user if request.user.is_authenticated else None)
-                return Response({"error": "An unexpected error occurred"}, status=500)
+                if request:
+                    ErrorLogger.log(e, app=app_name, user=request.user if getattr(request, 'user', None) and request.user.is_authenticated else None)
+                return JsonResponse({"error": "An unexpected error occurred"}, status=500)
         return wrapper
     return decorator
+
 
 def catch_admin_errors(app_name):
     def decorator(func):
