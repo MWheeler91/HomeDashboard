@@ -1,0 +1,47 @@
+from django.db import models
+from classutils.models import BaseModel
+from common.models import File
+# Create your models here.
+
+class TaxYear(BaseModel):
+    class Meta:
+        db_table = 'tax_year'
+    year = models.PositiveIntegerField(unique=True)
+    notes = models.TextField(blank=True)
+    tax_return = models.ForeignKey(File, on_delete=models.PROTECT, blank=True, null=True)
+
+    def __str__(self):
+        return str(self.year)
+
+class Business(BaseModel):
+    name = models.CharField(max_length=255)
+    ein = models.CharField(max_length=20, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+
+class WriteOffCategory(models.Model):
+    name = models.CharField(max_length=100)
+    business = models.BooleanField(default=True)
+    personal = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+
+class WriteOff(BaseModel):
+    class Meta:
+        ordering = ['tax_year','description']
+
+    tax_year = models.ForeignKey(TaxYear, on_delete=models.CASCADE)
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True)
+    category = models.ForeignKey(WriteOffCategory, on_delete=models.SET_NULL, null=True, blank=True)
+    description = models.TextField(blank=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateField()
+    receipt = models.ForeignKey(File, on_delete=models.CASCADE, blank=True, null=True)
+    tags = models.CharField(max_length=255, blank=True, help_text="Comma-separated tags like 'mileage, gas'")
+
+    def __str__(self):
+        label = f"{self.tax_year.year} - ${self.amount} - {str(self.category) if self.category else 'Uncategorized'}"
+        return f"{label} ({'Personal' if self.business is None else self.business.name})"

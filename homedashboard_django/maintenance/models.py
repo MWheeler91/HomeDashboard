@@ -1,28 +1,19 @@
 import os
 from django.db import models
 from datetime import datetime
-
+from classutils.models import BaseModel
+from common.models import Category
 # Create your models here.
 from account.models import User
 
 
-# ------------------  Custom Functions -------------------
+# can't delete.  Django complains.  Fix at a later date.
 def maintenance_file_upload_path(instance, filename):
     vehicle_folder = f"uploads/maintenance_files/{instance.maintenance.vehicle}/"
     return os.path.join(vehicle_folder, filename)
 
-class Category(models.Model):
-    category = models.CharField(max_length=200, unique=True)
 
-    def __str__(self):
-        return "{}".format(self.category)
-        
-    class Meta:
-        verbose_name = "Category"
-        verbose_name_plural = "Categories"
-
-
-class Vehicle(models.Model):
+class Vehicle(BaseModel):
     year = models.IntegerField()
     make = models.CharField(max_length=30)
     model = models.CharField(max_length=30)
@@ -32,28 +23,21 @@ class Vehicle(models.Model):
     license_plate_number = models.CharField(max_length=10, blank=True, null=True)
     starting_mileage = models.IntegerField()
     is_active = models.BooleanField(default=True)    
-    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='vehicles')
-    date_entered = models.DateField(default=datetime.now)
-    last_updated_date = models.DateField(auto_now=True, blank=True, null=True)
-    last_updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
-    last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-
 
     def __str__(self):
         return f"{self.year} {self.make} {self.model}"
 
 
-
 class Maintenance(models.Model):
     fk_vehicle_id = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
     mileage = models.IntegerField()
-    fk_category_id = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    fk_category_id = models.ForeignKey(Category, on_delete=models.SET_NULL, limit_choices_to={'app_laber': 'maintenance'}, null=True)
     short_description = models.CharField(max_length=50, default="")
     maintenance_performed = models.TextField()
     cost = models.DecimalField(max_digits=100, decimal_places=2)
     date_performed = models.DateField(default=datetime.now)
     next_service_date = models.DateField(blank=True, null=True)
-    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='maintence')
+    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='maintenance')
     date_entered = models.DateField(default=datetime.now)
     last_updated_date = models.DateField(auto_now=True, blank=True, null=True)
     last_updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
@@ -68,24 +52,7 @@ class Maintenance(models.Model):
     class Meta:
         verbose_name = "Maintenance"
         verbose_name_plural = "Maintenance"
-
-
-class MaintenanceFile(models.Model):
-    fk_maintenance_id = models.ForeignKey(Maintenance, on_delete=models.SET_NULL, null=True)
-    date_entered = models.DateField(default=datetime.now)
-    updated_date = models.DateField(auto_now=True, blank=True, null=True)
-    updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
-    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    files = models.FileField(
-        upload_to=maintenance_file_upload_path, blank=True, null=True
-    )
-
-    def file_name(self):
-        return os.path.basename(self.files.name)
-
-    def __str__(self):
-        return os.path.basename(self.files.name)
-
+4
 
 class Accessory(models.Model):
     fk_vehicle_id = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
@@ -109,23 +76,7 @@ class Accessory(models.Model):
         verbose_name = "Accessory"
         verbose_name_plural = "Accessories"
 
-
-class AccessoriesFile(models.Model):
-    fk_vehicle_id = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
-    fk_accessory_id = models.ForeignKey(Accessory, on_delete=models.SET_NULL, null=True)
-    files = models.FileField(upload_to="uploads/accessories/", blank=True, null=True)
-    date_entered = models.DateField(default=datetime.now)
-    updated_date = models.DateField(auto_now=True, blank=True, null=True)
-    updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
-    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-
-    def file_name(self):
-        return os.path.basename(self.files.name)
-
-    def __str__(self):
-        return os.path.basename(self.files.name)
     
-
 class VehicleRegistration(models.Model):
     fk_vehicle_id = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
     registration_expiration_date = models.DateField(blank=True, null=True)

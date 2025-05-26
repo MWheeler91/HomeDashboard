@@ -5,9 +5,9 @@ from classutils.admin import BaseModelAdmin
 from .models import *
 
 # Register your models here.
-admin.site.register(Room)
-admin.site.register(Category)
-admin.site.register(Condition)
+# admin.site.register(Room)
+# admin.site.register(Category)
+# admin.site.register(Condition)
 
 class ItemAccessoriesAdmin(BaseModelAdmin):
     formfield_overrides = {

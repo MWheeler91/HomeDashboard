@@ -18,11 +18,9 @@ class MaintenanceAdmin(BaseModelAdmin):
 
 
 
-admin.site.register(Category)
+
 admin.site.register(Vehicle, DefaultAdmin)
 admin.site.register(Maintenance, MaintenanceAdmin)
-admin.site.register(MaintenanceFile)
 admin.site.register(Accessory, DefaultAdmin)
-admin.site.register(AccessoriesFile)
 admin.site.register(VehicleRegistration, DefaultAdmin)
 

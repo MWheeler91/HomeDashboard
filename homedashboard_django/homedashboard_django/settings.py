@@ -77,7 +77,9 @@ INSTALLED_APPS = [
     'maintenance',
     'email_mgt',
     'error_logging',
-    'audiowatch'
+    'audiowatch',
+    'common',
+    'taxes'
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

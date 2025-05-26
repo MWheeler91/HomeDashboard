@@ -1,36 +1,37 @@
 from django.db import models
 from datetime import datetime
 from account.models import User
+from common.models import Category, Room, Condition
 # Create your models here
 
 def get_json():
     return { 'Field1': [], 'Field2': [],'Field3': []}
 
-class Category(models.Model):
-    item_category = models.CharField(max_length=200, unique=True)
+# class Category_old(models.Model):
+#     item_category = models.CharField(max_length=200, unique=True)
 
-    def __str__(self):
-        return "{}".format(self.item_category)
+#     def __str__(self):
+#         return "{}".format(self.item_category)
 
-class Room(models.Model):
-    room = models.CharField(max_length=200, unique=True)
+# class Room_old(models.Model):
+#     room = models.CharField(max_length=200, unique=True)
 
-    def __str__(self):
-        return "{}".format(self.room)
+#     def __str__(self):
+#         return "{}".format(self.room)
 
 
-class Condition(models.Model):
-    condition = models.CharField(max_length=200, unique=True)
+# class Condition_old(models.Model):
+#     condition = models.CharField(max_length=200, unique=True)
 
-    def __str__(self):
-        return "{}".format(self.condition)
+#     def __str__(self):
+#         return "{}".format(self.condition)
 
 class Item(models.Model):
     item_name = models.CharField(max_length=200)
     item_description = models.CharField(max_length=200, blank=True, null=True)
-    fk_category_id = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
-    fk_condition_id = models.ForeignKey(Condition, on_delete=models.SET_NULL, blank=True, null=True)
-    fk_room_id = models.ForeignKey(Room, on_delete=models.SET_NULL, blank=True, null=True)
+    fk_category_id = models.ForeignKey(Category, on_delete=models.SET_NULL, limit_choices_to={'app_label': 'catalog'}, blank=True, null=True)
+    fk_condition_id = models.ForeignKey(Condition, on_delete=models.SET_NULL, limit_choices_to={'app_label': 'catalog'}, blank=True, null=True)
+    fk_room_id = models.ForeignKey(Room, on_delete=models.SET_NULL, blank=True, limit_choices_to={'app_label': 'catalog'}, null=True)
     purchase_price = models.DecimalField(max_digits=100, decimal_places=2, blank=True, null=True)
     purchase_date = models.DateField(blank=True, null=True)
     value_now = models.DecimalField(max_digits=100, decimal_places=2, blank=True, null=True)
@@ -50,7 +51,7 @@ class Item(models.Model):
         ordering = ['id']
 
     def __str__(self):
-        match self.fk_category_id.item_category if self.fk_category_id else None:
+        match self.fk_category_id.name if self.fk_category_id else None:
             case 'Server':
                 return f"{self.id}: {self.item_name} - {self.asset_tag}"
             case _:

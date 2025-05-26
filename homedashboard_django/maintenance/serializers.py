@@ -14,11 +14,6 @@ class VehicleStringSerializer(serializers.ModelSerializer):
     def get_vehicle_string(self, obj):
         return str(obj)
 
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = "__all__"
-
 class VehicleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vehicle
@@ -82,25 +77,11 @@ class NewMaintenanceSerializer(serializers.ModelSerializer):
             
         ]
 
-
-class MaintenanceFileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MaintenanceFile
-        fields = "__all__"
-
-
 class AccessorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Accessory
         fields =  "__all__"
         
-
-
-class AccessoriesFileSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = AccessoriesFile
-        fields = "__all__"
         
 
     # def get_entered_by(self, obj):
