@@ -53,6 +53,10 @@ class Category(CommonModel):
         verbose_name = "Category"
         verbose_name_plural = "Categories"
         db_table = 'category'
+    is_maint = models.BooleanField(default=False)
+    is_catalog = models.BooleanField(default=False)
+    is_tax_personal = models.BooleanField(default=False)
+    is_tax_business = models.BooleanField(default=False)
 
 class Room(CommonModel):
     class Meta:

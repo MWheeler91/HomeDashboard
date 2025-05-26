@@ -1,13 +1,24 @@
 from django.db import models
 from classutils.models import BaseModel
+<<<<<<< HEAD
 from common.models import File
+=======
+from common.models import File, Category
+>>>>>>> 319db39 (Fix: cleaned up accidental folder commit and committed correct changes)
 # Create your models here.
 
 class TaxYear(BaseModel):
     class Meta:
         db_table = 'tax_year'
+<<<<<<< HEAD
     year = models.PositiveIntegerField(unique=True)
     notes = models.TextField(blank=True)
+=======
+        ordering = ['-year']
+    year = models.PositiveIntegerField(primary_key=True)
+    notes = models.TextField(blank=True)
+    is_active = models.BooleanField(default=False)
+>>>>>>> 319db39 (Fix: cleaned up accidental folder commit and committed correct changes)
     tax_return = models.ForeignKey(File, on_delete=models.PROTECT, blank=True, null=True)
 
     def __str__(self):
@@ -21,6 +32,7 @@ class Business(BaseModel):
     def __str__(self):
         return self.name
 
+<<<<<<< HEAD
 class WriteOffCategory(models.Model):
     name = models.CharField(max_length=100)
     business = models.BooleanField(default=True)
@@ -29,13 +41,21 @@ class WriteOffCategory(models.Model):
     def __str__(self):
         return self.name
 
+=======
+>>>>>>> 319db39 (Fix: cleaned up accidental folder commit and committed correct changes)
 class WriteOff(BaseModel):
     class Meta:
         ordering = ['tax_year','description']
 
+<<<<<<< HEAD
     tax_year = models.ForeignKey(TaxYear, on_delete=models.CASCADE)
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True)
     category = models.ForeignKey(WriteOffCategory, on_delete=models.SET_NULL, null=True, blank=True)
+=======
+    tax_year = models.ForeignKey(TaxYear,limit_choices_to={'is_active': True}, on_delete=models.CASCADE)
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+>>>>>>> 319db39 (Fix: cleaned up accidental folder commit and committed correct changes)
     description = models.TextField(blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField()
