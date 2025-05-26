@@ -3,7 +3,7 @@ from classutils.models import BaseModel
 from common.models import File, Category
 # Create your models here.
 
-class TaxYear(BaseModel):
+class TaxYear(models.Model):
     class Meta:
         db_table = 'tax_year'
         ordering = ['-year']
