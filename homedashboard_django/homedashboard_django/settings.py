@@ -37,7 +37,7 @@ DEBUG = env('DEBUG')
 AUTH_USER_MODEL = 'account.User'
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.AllowAllUsersModelBackend',
-    'account.backends.CaseInsensitiveModelBackend'
+    'apps.core.account.backends.CaseInsensitiveModelBackend'
 )
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.50.67', '192.168.50.66', 'django001']
 CORS_ALLOWED_ORIGINS = [
@@ -70,16 +70,26 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap4',
     'django_celery_beat',
+    
+    # Core
+    'apps.core.account',
+    'apps.core.common',
+    'apps.core.error_logging',
+    'apps.core.notifications',
+    'apps.core.automation',
 
-    'apps',
-    'account',
-    'catalog',
-    'maintenance',
-    'email_mgt',
-    'error_logging',
-    'audiowatch',
-    'common',
-    'taxes'
+    # Infrastructure
+    'apps.infra.devices',
+    'apps.infra.monitoring',
+    'apps.infra.audiowatch',
+    'apps.infra.analytics',
+
+    # Services
+    'apps.services.apps',
+    'apps.services.email_mgt',
+    'apps.services.maintenance',
+    'apps.services.catalog',
+    'apps.services.taxes',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -123,9 +133,9 @@ WSGI_APPLICATION = 'homedashboard_django.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
+        'NAME': env('DB_NAME_TEST'),
+        'USER': env('DB_USER_TEST'),
+        'PASSWORD': env('DB_PASSWORD_TEST'),
         'HOST': env('DB_HOST'),
         'PORT': env('DB_PORT'),
     },
