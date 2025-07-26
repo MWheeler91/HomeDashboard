@@ -49,7 +49,7 @@ upload_path_handlers = {
 
 
 class Category(CommonModel):
-    class Meta:
+    class Meta(CommonModel.Meta):
         verbose_name = "Category"
         verbose_name_plural = "Categories"
         db_table = 'category'
@@ -59,15 +59,15 @@ class Category(CommonModel):
     is_tax_business = models.BooleanField(default=False)
 
 class Room(CommonModel):
-    class Meta:
+    class Meta(CommonModel.Meta):
         db_table = 'room'
 
 class Condition(CommonModel):
-    class Meta:
+    class Meta(CommonModel.Meta):
         db_table = 'condition'
 
 class File(BaseModel):
-    class Meta:
+    class Meta(BaseModel.Meta):
         db_table = 'file'
     
     file = models.FileField(upload_to=dynamic_upload_path)

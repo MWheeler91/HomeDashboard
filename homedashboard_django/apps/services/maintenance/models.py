@@ -31,7 +31,7 @@ class Vehicle(BaseModel):
 class Maintenance(models.Model):
     fk_vehicle_id = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
     mileage = models.IntegerField()
-    fk_category_id = models.ForeignKey(Category, on_delete=models.SET_NULL, limit_choices_to={'app_laber': 'maintenance'}, null=True)
+    fk_category_id = models.ForeignKey(Category, on_delete=models.SET_NULL, limit_choices_to={'app_label': 'maintenance'}, null=True)
     short_description = models.CharField(max_length=50, default="")
     maintenance_performed = models.TextField()
     cost = models.DecimalField(max_digits=100, decimal_places=2)

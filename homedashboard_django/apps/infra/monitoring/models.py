@@ -11,9 +11,11 @@ class MonitoringConfig(BaseModel):
     fk_device_id = models.ForeignKey(ManagedDevice, on_delete=models.CASCADE, related_name='config')
     brute_force_monitoring = models.BooleanField(default=False ) 
     package_checking = models.BooleanField(default=False)
-    interval = models.IntegerField(default=60, null=False)
+    brute_force_interval = models.IntegerField(default=60, null=False, help_text="How often should you check failed logins?")
+    package_interval = models.IntegerField(default=60*24, null=False, help_text="How often should you check if the server has package updates?")
+    is_alive_interval = models.IntegerField(default=60, null=False, help_text="How often should you check if the server is online?")
     is_active = models.BooleanField(default=True)
-
+    
     def __str__(self):
         return f'{self.fk_device_id.hostname} Config'
 

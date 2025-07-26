@@ -1,5 +1,6 @@
 from django.db import models
 from classutils.models import BaseModel
+from rest_framework.authtoken.models import Token
 from apps.core.account.models import User
 
 OS_CHOICES = [
@@ -30,7 +31,10 @@ class ManagedDevice(BaseModel):
     device_type = models.CharField(max_length=20, choices=Type_CHOICES)
     is_active = models.BooleanField(default=True)
     is_virtual = models.BooleanField(default=False)
+    is_public_facing = models.BooleanField(default=False)
+    is_processed = models.BooleanField(default=False)
     has_keys = models.BooleanField(default=False)
+    needs_keys = models.BooleanField(default=True)
     kernel_version = models.CharField(max_length=100, blank=True, null=True)
     cpu_cores = models.IntegerField(blank=True, null=True)
     ram_total_mb = models.IntegerField(blank=True, null=True)
@@ -42,7 +46,14 @@ class ManagedDevice(BaseModel):
         return self.hostname
     
 
-   
+class DeviceAuth(models.Model):
+    device = models.OneToOneField(ManagedDevice, on_delete=models.CASCADE, related_name='auth')
+    token = models.OneToOneField(Token, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Auth for {self.device.hostname}"  
+
 class SshKeys(BaseModel):
     class Meta:
         db_table = 'ssh_keys'
