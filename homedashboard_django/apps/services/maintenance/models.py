@@ -30,13 +30,14 @@ class Vehicle(BaseModel):
 
 class Maintenance(models.Model):
     fk_vehicle_id = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
-    mileage = models.IntegerField()
+    mileage = models.IntegerField(null=True, blank=True)
     fk_category_id = models.ForeignKey(Category, on_delete=models.SET_NULL, limit_choices_to={'app_label': 'maintenance'}, null=True)
     short_description = models.CharField(max_length=50, default="")
     maintenance_performed = models.TextField()
     cost = models.DecimalField(max_digits=100, decimal_places=2)
     date_performed = models.DateField(default=datetime.now)
     next_service_date = models.DateField(blank=True, null=True)
+
     entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='maintenance')
     date_entered = models.DateField(default=datetime.now)
     last_updated_date = models.DateField(auto_now=True, blank=True, null=True)
@@ -89,7 +90,7 @@ class VehicleRegistration(models.Model):
     last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_query_name='registration_updated')
 
     def __str__(self):
-        return os.path.basename(f"{self.registration_expiration_date.year - 1} - {self.vehicle}")   
+        return os.path.basename(f"{self.registration_expiration_date.year - 1} - {self.fk_vehicle_id}")   
 
 
 

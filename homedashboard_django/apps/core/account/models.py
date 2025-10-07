@@ -1,6 +1,6 @@
 from django.db import models
-from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-
+from django.contrib.auth.base_user import BaseUserManager #,AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
 # user Auth guide I followed
 # https://www.youtube.com/watch?v=SFarxlTzVX4&t=883s
@@ -34,7 +34,7 @@ class MyAccountManager(BaseUserManager):
         return user
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         app_label = 'account'
         

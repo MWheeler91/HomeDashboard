@@ -21,6 +21,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 INSTALLED_APPS = [
+     "jazzmin",  # custom admin pip install django-jazzmin
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -177,4 +178,31 @@ LOGGING = {
             'propagate': False,
         },
     },
+}
+
+
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Dashboard",
+    "site_header": "Admin",
+    "site_brand": "Dashboard",
+    "welcome_sign": "Welcome to the Dashboard",
+    "copyright": "Mwheeler Development",
+    "search_model": "account.User",
+    "show_ui_builder": "True",
+    # "hide_apps": ["auth", "authtoken"],
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "account.User": "fas fa-user",
+        "sitecontent.HomePage": "fas fa-home",
+        "services.Event": "fas fa-calendar",
+    },
+    # "order_with_respect_to": ["account", "sitecontent", "contact", "events"],
+    "topmenu_links": [
+        {"name": "Home", "url": "/", "permissions": ["auth.view_user"]},
+        {"model": "account.User"},
+    ],
+}
+JAZZMIN_UI_TWEAKS = {
+    "theme": "cyborg",  # "darkly" "cyborg", "slate", "superhero"
 }
