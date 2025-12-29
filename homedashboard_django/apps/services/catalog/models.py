@@ -1,7 +1,7 @@
 from django.db import models
 from datetime import datetime
 from apps.core.account.models import User
-from apps.core.common.models import Category, Room, Condition
+from apps.core.common.models import Category, Room, Condition, Console
 # Create your models here
 
 def get_json():
@@ -32,6 +32,8 @@ class Item(models.Model):
     fk_category_id = models.ForeignKey(Category, on_delete=models.SET_NULL, limit_choices_to={'app_label': 'catalog'}, blank=True, null=True)
     fk_condition_id = models.ForeignKey(Condition, on_delete=models.SET_NULL, limit_choices_to={'app_label': 'catalog'}, blank=True, null=True)
     fk_room_id = models.ForeignKey(Room, on_delete=models.SET_NULL, blank=True, limit_choices_to={'app_label': 'catalog'}, null=True)
+    fk_console_id = models.ForeignKey(Console, on_delete=models.SET_NULL, blank=True, null=True)
+    box = models.CharField(max_length=10, null=True, blank=True)
     purchase_price = models.DecimalField(max_digits=100, decimal_places=2, blank=True, null=True)
     purchase_date = models.DateField(blank=True, null=True)
     value_now = models.DecimalField(max_digits=100, decimal_places=2, blank=True, null=True)
@@ -88,4 +90,27 @@ class ItemAccessories(models.Model):
     last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return f"{self.id}: {self.item.item_name} - {self.name}"
+        return f"{self.id}: {self.fk_item_id.item_name} - {self.name}"
+    
+
+class NatashaCollection(models.Model):
+    item_name = models.CharField(max_length=200)
+    item_description = models.CharField(max_length=200, blank=True, null=True)
+    extra = models.CharField(max_length=200, blank=True, null=True)
+    fk_category = models.ForeignKey(Console, on_delete=models.SET_NULL, blank=True, null=True)
+    box = models.BooleanField(default=False)
+    cib = models.BooleanField(default=False)
+    sealed = models.BooleanField(default=False)
+    
+    selling = models.BooleanField(default=True)
+    purchase_price = models.DecimalField(max_digits=100, decimal_places=2, blank=True, null=True)
+    purchase_date = models.DateField(blank=True, null=True)
+    value_now = models.DecimalField(max_digits=100, decimal_places=2, blank=True, null=True)
+    serial_number = models.CharField(max_length=50, blank=True, null=True)
+    model_number = models.CharField(max_length=50, blank=True, null=True)
+
+    date_entered = models.DateField(default=datetime.now)
+
+
+    def __str__(self):
+        return f'{self.id}: ({self.fk_category}){self.item_name}'

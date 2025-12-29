@@ -1,11 +1,12 @@
 import os
 from django.db import models
-from datetime import datetime
-from classutils.models import BaseModel
+from datetime import datetime, date,timedelta
+# from classutils.models import BaseModel
 from apps.core.common.models import Category
 # Create your models here.
 from apps.core.account.models import User
-
+from utils.models import BaseModel
+from django.db.models import Max
 
 # can't delete.  Django complains.  Fix at a later date.
 def maintenance_file_upload_path(instance, filename):
@@ -13,7 +14,62 @@ def maintenance_file_upload_path(instance, filename):
     return os.path.join(vehicle_folder, filename)
 
 
+# TODO (Mileage edge case):
+# If a Maintenance record's `asset` is ever changed after creation (Vehicle A → Vehicle B),
+# the mileage for BOTH vehicles may need to be recomputed.
+# Currently we only recompute the NEW vehicle, which could leave the OLD vehicle's
+# current_mileage incorrect.
+#
+# When revisiting:
+# - Decide whether Maintenance.asset should be immutable after creation
+# - OR add logic to recompute mileage for the previous asset as well
+
+
+class Asset(BaseModel):
+    ASSET_TYPES = (
+        ("vehicle", "Vehicle"),
+        ("home", "Home"),
+        ("system", "System"),
+        ("appliance", "Appliance")
+    )
+    name = models.CharField(max_length=100)
+    asset_type = models.CharField(max_length=20, choices=ASSET_TYPES)
+    location = models.CharField(max_length=100, blank=True, null=True)
+    notes = models.TextField(blank=True, null=True) 
+
+    def __str__(self):
+        return self.name
+
+class Consumable(BaseModel):
+    name = models.CharField(max_length=100)
+    brand = models.CharField(max_length=100, blank=True, null=True)
+    part_number = models.CharField(max_length=100, blank=True, null=True)
+    notes = models.CharField(max_length=255,blank=True, null=True)
+    link = models.URLField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+class Mileage(models.Model):
+    fk_asset = models.ForeignKey(
+        Asset,
+        on_delete=models.CASCADE,
+        related_name="mileage",
+        limit_choices_to={"asset_type": "vehicle"},
+        null=True,
+        blank=True,
+    )
+    mileage=models.IntegerField()
+
 class Vehicle(BaseModel):
+    fk_asset = models.OneToOneField(
+        Asset,
+        on_delete=models.CASCADE,
+        related_name="vehicle",
+        limit_choices_to={"asset_type": "vehicle"},
+        null=True,
+        blank=True,
+    )
     year = models.IntegerField()
     make = models.CharField(max_length=30)
     model = models.CharField(max_length=30)
@@ -21,42 +77,127 @@ class Vehicle(BaseModel):
     description = models.CharField(max_length=50, blank=True, null=True)
     vin_number = models.CharField(max_length=17, default="")
     license_plate_number = models.CharField(max_length=10, blank=True, null=True)
-    starting_mileage = models.IntegerField()
-    is_active = models.BooleanField(default=True)    
+    starting_mileage = models.IntegerField(blank=True,null=True)
+    current_mileage = models.IntegerField(blank=True,null=True)
+    mileage_this_year = models.IntegerField(blank=True,null=True)
 
     def __str__(self):
         return f"{self.year} {self.make} {self.model}"
-
-
-class Maintenance(models.Model):
-    fk_vehicle_id = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
-    mileage = models.IntegerField(null=True, blank=True)
-    fk_category_id = models.ForeignKey(Category, on_delete=models.SET_NULL, limit_choices_to={'app_label': 'maintenance'}, null=True)
-    short_description = models.CharField(max_length=50, default="")
-    maintenance_performed = models.TextField()
-    cost = models.DecimalField(max_digits=100, decimal_places=2)
-    date_performed = models.DateField(default=datetime.now)
-    next_service_date = models.DateField(blank=True, null=True)
-
-    entered_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='maintenance')
-    date_entered = models.DateField(default=datetime.now)
-    last_updated_date = models.DateField(auto_now=True, blank=True, null=True)
-    last_updated_time = models.TimeField(auto_now=True,  blank=True, null=True)
-    last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_query_name='maintenance_updated')
     
+    def recompute_current_mileage(self, save=True):
+        if not self.fk_asset_id:
+            return None
 
-    # part details ( part used / part number )
+        max_mileage = (
+            Mileage.objects
+            .filter(fk_asset_id=self.fk_asset_id, mileage__isnull=False)
+            .aggregate(Max("mileage"))["mileage__max"]
+        )
+
+        if max_mileage != self.current_mileage:
+            self.current_mileage = max_mileage
+            if save:
+                self.save(update_fields=["current_mileage"])
+
+        return max_mileage
+
+class MaintenanceTask(BaseModel):
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name="tasks")
+    name = models.CharField(max_length=100)
+    # category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+    interval_days = models.PositiveIntegerField(null=True, blank=True)
+    interval_miles = models.PositiveIntegerField(null=True, blank=True)
+    reminder = models.BooleanField(default=True)
+    due_now = models.BooleanField(default=True)
+    next_due_date = models.DateField(blank=True,null=True)
+    consumables = models.ManyToManyField(
+        Consumable, through="TaskConsumable", blank=True, related_name="tasks"
+    )
 
     def __str__(self):
-        return f"{self.date_performed.strftime('%m/%d/%Y')} - {self.fk_vehicle_id} - {self.fk_category_id} - {self.short_description}"
-    
-    class Meta:
+        return self.name
+
+class TaskConsumable(models.Model):
+    task = models.ForeignKey(MaintenanceTask, on_delete=models.CASCADE)
+    consumable = models.ForeignKey(Consumable, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return self.task.name
+
+
+
+class Maintenance(BaseModel):
+    class Meta(BaseModel.Meta):
         verbose_name = "Maintenance"
         verbose_name_plural = "Maintenance"
-4
+
+    asset = models.ForeignKey(Asset, on_delete=models.SET_NULL, null=True, blank=True)
+    task = models.ForeignKey(MaintenanceTask, on_delete=models.SET_NULL, null=True, blank=True)
+    # fk_vehicle_id = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
+    mileage = models.IntegerField(null=True, blank=True)
+    fk_category_id = models.ForeignKey(Category, on_delete=models.SET_NULL, limit_choices_to={'app_label': 'maintenance'}, null=True, blank=True)
+    short_description = models.CharField(max_length=50, default="", null=True, blank=True)
+    maintenance_performed = models.TextField(null=True, blank=True)
+    completed = models.BooleanField(default=False)
+    cost = models.DecimalField(max_digits=100, decimal_places=2,null=True, blank=True)
+    date_performed = models.DateField(default=datetime.now)
+    # next_service_date = models.DateField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.date_performed.strftime('%m/%d/%Y')} - {self.asset} - {self.fk_category_id} - {self.short_description}"
+    
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        old_mileage = None
+        was_completed = False
+
+        if not is_new:
+            previous = Maintenance.objects.only("mileage", "completed").get(pk=self.pk)
+            old_mileage = previous.mileage
+            was_completed = previous.completed
+
+        super().save(*args, **kwargs)
+
+        # Task completion transition
+        if not was_completed and self.completed and self.task:
+            task = self.task
+            task.due_now = False
+            if task.interval_days:
+                task.next_due_date = self.date_performed + timedelta(days=task.interval_days)
+            task.save(update_fields=["due_now", "next_due_date"])
+
+        # Mileage logging + recompute
+        should_log_mileage = (
+            self.asset_id
+            and self.mileage is not None
+            and self.asset.asset_type == "vehicle"
+            and (is_new or self.mileage != old_mileage)
+        )
+
+        if should_log_mileage:
+            Mileage.objects.create(fk_asset_id=self.asset_id, mileage=self.mileage)
+
+            try:
+                vehicle = self.asset.vehicle
+            except Vehicle.DoesNotExist:
+                vehicle = None
+
+            if vehicle:
+                vehicle.recompute_current_mileage()
+
+
+        
 
 class Accessory(models.Model):
-    fk_vehicle_id = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
+    fk_asset = models.ForeignKey(
+        Asset,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        limit_choices_to={"asset_type": "vehicle"},
+    )
+    # fk_vehicle_id = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
     brand = models.CharField(max_length=50, blank=True, null=True)
     short_description = models.CharField(max_length=50)
     description = models.CharField(max_length=50, blank=True, null=True)
@@ -71,7 +212,7 @@ class Accessory(models.Model):
     last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return f"{self.fk_vehicle_id} - {self.short_description}"
+        return f"{self.fk_asset} - {self.short_description}"
     
     class Meta:
         verbose_name = "Accessory"
@@ -79,7 +220,14 @@ class Accessory(models.Model):
 
     
 class VehicleRegistration(models.Model):
-    fk_vehicle_id = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
+    fk_asset = models.ForeignKey(
+        Asset,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        limit_choices_to={"asset_type": "vehicle"},
+    )
+    # fk_vehicle_id = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True)
     registration_expiration_date = models.DateField(blank=True, null=True)
     date_paid = models.DateField(blank=True, null=True)
     active_year = models.BooleanField()
@@ -90,7 +238,7 @@ class VehicleRegistration(models.Model):
     last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_query_name='registration_updated')
 
     def __str__(self):
-        return os.path.basename(f"{self.registration_expiration_date.year - 1} - {self.fk_vehicle_id}")   
+        return os.path.basename(f"{self.registration_expiration_date.year - 1} - {self.fk_asset}")   
 
 
 

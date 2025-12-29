@@ -15,4 +15,5 @@ class CategoryAdmin(admin.ModelAdmin):
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Room)
 admin.site.register(Condition)
+admin.site.register(Console)
 admin.site.register(File, DefaultAdmin)

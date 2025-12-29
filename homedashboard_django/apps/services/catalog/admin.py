@@ -19,6 +19,14 @@ class ItemAdmin(BaseModelAdmin):
         JSONField: {'widget': JSONEditorWidget},
     }
 
+@admin.register(NatashaCollection)
+class NatashaCollectionAdmin(admin.ModelAdmin):
+    list_display = ['item_name','item_description','fk_category','cib','sealed','selling']
+    list_filter = ["fk_category"]
+    search_fields = ["item_name"]
 
 admin.site.register(Item, ItemAdmin)
 admin.site.register(ItemAccessories, ItemAccessoriesAdmin)
+
+
+# admin.site.register(NatashaCollection)

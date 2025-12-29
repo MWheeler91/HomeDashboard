@@ -58,6 +58,25 @@ class Category(CommonModel):
     is_tax_personal = models.BooleanField(default=False)
     is_tax_business = models.BooleanField(default=False)
 
+class SubCategory(CommonModel):
+    class Meta(CommonModel.Meta):
+        verbose_name = "Sub Category"
+        verbose_name_plural = "Sub Categories"
+        db_table = 'subcategory'
+
+    name = models.CharField(max_length=200)
+    
+class Console(CommonModel):
+    class Meta(CommonModel.Meta):
+        verbose_name = "Console"
+        verbose_name_plural = "Consoles"
+        db_table = 'Console'
+
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f"{self.name}"
+
 class Room(CommonModel):
     class Meta(CommonModel.Meta):
         db_table = 'room'
