@@ -47,12 +47,25 @@ upload_path_handlers = {
     'writeoff': get_upload_path_for_writeoff,
 }
 
+class CategoryLabel(models.Model):
+    class Meta:
+        verbose_name = "Category Label"
+        verbose_name_plural = "Category Labels"
+        db_table = 'category_labels'
+
+    name = models.CharField(max_length=50, primary_key=True)
+
+    def __str__(self):
+        return self.name
+    
+
 
 class Category(CommonModel):
     class Meta(CommonModel.Meta):
         verbose_name = "Category"
         verbose_name_plural = "Categories"
         db_table = 'category'
+    label = models.ForeignKey(CategoryLabel, on_delete=models.CASCADE, blank=True, null=True)
     is_maint = models.BooleanField(default=False)
     is_catalog = models.BooleanField(default=False)
     is_tax_personal = models.BooleanField(default=False)
