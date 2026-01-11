@@ -1,6 +1,7 @@
 from django.db import models
 from classutils.models import BaseModel
 from apps.core.common.models import File
+from datetime import datetime
 # Create your models here.
 
 class Category(models.Model):
@@ -44,7 +45,7 @@ class Ledger(BaseModel):
     description = models.TextField(blank=True)
     amount_payable = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Payable', null=True, blank=True)
     amount_receivable = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Receivable', null=True, blank=True)
-    date = models.DateField(auto_now=True)
+    date = models.DateField(default=datetime.now)
     receipt = models.ForeignKey(File, on_delete=models.CASCADE, blank=True, null=True)
     tags = models.CharField(max_length=255, blank=True, help_text="Comma-separated tags like 'mileage, gas'")
 

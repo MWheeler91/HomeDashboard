@@ -12,7 +12,6 @@ def maintenance_file_upload_path(instance, filename):
     vehicle_folder = f"uploads/maintenance_files/{instance.maintenance.vehicle}/"
     return os.path.join(vehicle_folder, filename)
 
-
 # TODO (Mileage edge case):
 # If a Maintenance record's `asset` is ever changed after creation (Vehicle A → Vehicle B),
 # the mileage for BOTH vehicles may need to be recomputed.
