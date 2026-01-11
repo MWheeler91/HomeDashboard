@@ -33,7 +33,7 @@ class TaxYearAdmin(admin.ModelAdmin):
     model=TaxYear
     search_fields = ("year","is_active",)
     list_display = ("year","notes", "is_active", "tax_return")
-    
+    inlines = (LedgerInlines,)
     fieldsets = (
         (
             "Details",
@@ -48,4 +48,4 @@ class TaxYearAdmin(admin.ModelAdmin):
         ),
     )
 
-    inlines = (LedgerInlines,)
+    
