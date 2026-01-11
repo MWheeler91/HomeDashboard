@@ -1,9 +1,9 @@
 from django import forms
-from .models import WriteOff
+from .models import Ledger
 from apps.core.common.models import Category 
 class WriteOffForm(forms.ModelForm):
     class Meta:
-        model = WriteOff
+        model = Ledger
         fields = '__all__'
 
     def __init__(self, *args, **kwargs):

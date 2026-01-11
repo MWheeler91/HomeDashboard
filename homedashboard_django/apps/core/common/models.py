@@ -111,4 +111,17 @@ class File(BaseModel):
     related_object = GenericForeignKey('content_type', 'object_id')
 
     def __str__(self):
-        return f"{self.file.name} attached to {self.related_object}"
+        fname = getattr(self.file, "name", "<no file>")
+        # Don't force resolution unless it's safe
+        ct = self.content_type
+        model_cls = ct.model_class() if ct else None
+
+        if model_cls is None:
+            return f"{fname} attached to <missing model {getattr(ct, 'app_label', '?')}.{getattr(ct, 'model', '?')}:{self.object_id}>"
+
+        # Model exists; object might not
+        obj = self.related_object
+        if obj is None:
+            return f"{fname} attached to <missing object {ct.app_label}.{ct.model}:{self.object_id}>"
+
+        return f"{fname} attached to {obj}"
